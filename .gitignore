@@ -1,4 +1,4 @@
 .venv/
 backend/database/electoral_app.db
-backend/database/main_dataset_loyola_prediction.xl
+backend/database/main_dataset_loyola_prediction.xlsx
 backend/database/profiles.csv
