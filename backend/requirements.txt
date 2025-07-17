@@ -1,0 +1,11 @@
+sqlalchemy
+sqlalchemy[asyncio]
+aiosqlite
+passlib
+bcrypt
+fastapi
+uvicorn[standard]
+python-jose[cryptography]
+folium
+scikit-learn
+geopy
