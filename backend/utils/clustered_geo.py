@@ -96,41 +96,70 @@ def combine_cluster_routes(start_coord, clusters, points, profile_ids):
 
 def display_clustered_route(full_ordered_points, cluster_results, start_coord=None):
     """
-    Draw final stitched map.
+    Returns a structured JSON for the final stitched map with all clusters.
+    
+    Parameters:
+    - full_ordered_points: [(lat, lon), ...] the complete ordered route including start
+    - cluster_results: list of (cluster_center, [profile_id, ...])
+    - start_coord: optional (lat, lon) tuple
+    
+    Returns:
+    {
+        "start": { "lat": ..., "lon": ... },
+        "markers": [ { "id": ..., "name": ..., "lat": ..., "lon": ..., "color": ... }, ... ],
+        "route": {
+            "type": "LineString",
+            "coordinates": [[lon, lat], ...]
+        }
+    }
     """
-    route_geojson = get_directions_route(full_ordered_points)
-    line_coords = route_geojson["features"][0]["geometry"]["coordinates"]
-    route_points = [(lat, lon) for lon, lat in line_coords]
+    if not full_ordered_points or not cluster_results:
+        print("Missing data for clustered route display.")
+        return
 
-    m = folium.Map(location=full_ordered_points[0], zoom_start=13)
-    # Add arrows
-    AntPath(route_points).add_to(m)
-    # Setup gradient
+    # Get directions
+    route_geojson = get_directions_route(full_ordered_points)
+    line_coords = route_geojson["features"][0]["geometry"]["coordinates"]  # [[lon, lat], ...]
+
+    # Optional color gradient
     colors = get_gradient_colors(len(full_ordered_points))
 
-    # START
-    folium.Marker(
-        location=full_ordered_points[0],
-        popup="START",
-        icon=folium.Icon(color="green", icon="play", prefix="fa")
-    ).add_to(m)
-
-    # Mark all stops with name lookup
+    # Load all involved profile names
+    profile_ids = [pid for _, cluster in cluster_results for pid in cluster]
     db = SessionLocal()
-    for idx, (_, ordered_ids) in enumerate(cluster_results, start=1):
-        for stop_idx, profile_id in enumerate(ordered_ids, start=1):
-            profile = db.query(Profile).filter(Profile.id == profile_id).first()
-            name = profile.name if profile else "Unknown"
-            stop_coord = full_ordered_points[stop_idx]
-            folium.Marker(
-                location=stop_coord,
-                popup=f"Stop {stop_idx}: {name}",
-                icon=folium.Icon(color=colors[stop_idx],
-                             icon="info-sign" if stop_idx > 0 else "play",
-                             prefix="glyphicon" if stop_idx > 0 else "fa")
-            ).add_to(m)
+    profile_map = {p.id: p.name for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     db.close()
 
-    folium.PolyLine(route_points, color="red", weight=3).add_to(m)
-    m.save("clustered_route_map.html")
-    print("Map saved as clustered_route_map.html")
+    # Build marker list
+    markers = []
+    point_idx = 1  # Start at 1 since index 0 is the start_coord
+
+    for (_, ordered_ids) in cluster_results:
+        for profile_id in ordered_ids:
+            if point_idx >= len(full_ordered_points):
+                print(f"Warning: Index {point_idx} out of range for coordinates.")
+                continue
+            lat, lon = full_ordered_points[point_idx]
+            markers.append({
+                "id": profile_id,
+                "name": profile_map.get(profile_id, "Unknown"),
+                "lat": lat,
+                "lon": lon,
+                "color": colors[point_idx]  # Optional gradient color
+            })
+            point_idx += 1
+
+    if not start_coord:
+        start_coord = full_ordered_points[0]
+
+    return {
+        "start": {
+            "lat": start_coord[0],
+            "lon": start_coord[1]
+        },
+        "markers": markers,
+        "route": {
+            "type": "LineString",
+            "coordinates": line_coords  # [[lon, lat], ...]
+        }
+    }

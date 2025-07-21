@@ -7,6 +7,7 @@ This project is a FastAPI-based backend tool that helps plan the most efficient 
 ## Purpose
 
 The purpose of this project is to:
+
 - Filter and locate user profiles from a database according to user-defined criteria
 - Plan an optimized real-road route starting from a given coordinate
 - Visualize the path clearly with direction arrows and color-coded markers
@@ -85,23 +86,28 @@ The purpose of this project is to:
 - Functions used to cleanup the original data and store it into an SQLite database, using `sqlalchemy`.
 
 ### Route Optimization
+
 - Uses OpenRouteService's `/optimization` and `/directions` endpoints
 - Starts from a user-defined location
 - Handles up to 500 points with automatic batching and clustering if necessary
 
 ### Intelligent Batching
+
 - Automatically clusters points when over 60 locations are passed
 - Prevents API request overload while preserving geographic locality
 
 ### Interactive Mapping
+
 - Uses [Folium](https://python-visualization.github.io/folium/) to generate route maps
 - Arrows on the route using animated `AntPath`
 - Start point highlighted in green
 - Other markers colored in a green-to-blue gradient to visualize visit order
 
 ### API Endpoint
+
 - POST `/profiles/optimize`
   - Body parameters:
+
     ```json
     {
       "start_lat": 48.8566,
@@ -116,27 +122,39 @@ The purpose of this project is to:
 
 ## Technologies Used
 
-- **Python 3.13**
-- **FastAPI** — Web API framework
-- **SQLAlchemy** — ORM for profile database
-- **Folium** — Interactive maps
-- **Scikit-learn** — KMeans clustering for optimization batching
-- **OpenRouteService** — Routing and optimization API
+### Backend :
+
+```Python``` backend, provided by ```FastAPI```, using ```sqlalchemy``` for database management.
+Route optimization made with ```ORS```.
+Authentication using ```jwt``` and ```bcrypt```.
+
+### Database :
+
+```SQLite``` installation, interfaced with ```Python``` using ```sqlalchemy```.
+
+### Frontend :
+
+```React``` (```TypeScript```) and ```Tailwind``` built over ```Vite```.
+Map display using ```Leaflet```.
 
 ---
 
 ## 📦 Setup & Usage
 
 0. **(Recommended) Setup a venv environment.**
+
     ```bash
     python -m venv .venv
     call .venv/Scripts/activate
     ```
 
 1. **Install dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
+
+   Note you'll need an API key from [OpenRouteService](https://openrouteservice.org/).
 
 2. **Run the FastAPI app**
 
@@ -146,32 +164,29 @@ The purpose of this project is to:
 
 3. **Register on the app**
 
-When prompted, select option 2 (create admin account).
-Enter your username and password.
+    When prompted, select option 2 (create admin account).
+    Enter your username and password.
 
 4. **Use the endpoint**
 
-Authenticate by calling ```/auth/login``` with the username and password defined.
+    Authenticate by calling ```/auth/login``` with the username and password defined.
 
-Send a POST request to ```/profiles/optimize``` with the filtering criteria
+    Send a POST request to ```/profiles/optimize``` with the filtering criteria
 
-It returns a GeoJSON of the optimized route
+    It returns a GeoJSON of the optimized route
 
-A map is saved locally as ```route_map.html``` or ```clustered_map.html``` depending on the number of points.
+    A map is saved locally as ```route_map.html``` or ```clustered_map.html``` depending on the number of points.
 
-To visualize the route, open the file in a browser.
+    To visualize the route, open the file in a browser.
 
-**NB :** You can run the ```cli_tester.py``` file located in ```backend``` for easier use.
-
-4. **Dependencies**
-
-Requires an API key from [OpenRouteService](https://openrouteservice.org/).
+  **NB :** You can run the ```cli_tester.py``` file located in ```backend``` for easier use.
 
 ## Future Improvements
-* Interactive frontend with live map previews
 
-* User authentication and saved preferences
+- Interactive frontend with live map previews
 
-* Exportable map/report PDF
+- User authentication and saved preferences
 
-* Better marker clustering for extremely dense zones
+- Exportable map/report PDF
+
+- Better marker clustering for extremely dense zones

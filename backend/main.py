@@ -4,6 +4,8 @@ from backend.utils.security import *
 from backend.utils.geo import update_profiles_latlon_from_csv, test_map
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 import os
 
 init_loop=True
@@ -41,7 +43,13 @@ else : start app
             init_loop=False
 
 app = FastAPI(title="Electoral Field App API")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 utils_routes.ping_route(app)
 app.include_router(auth_routes.router)
 app.include_router(admin_routes.router)

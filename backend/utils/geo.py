@@ -227,19 +227,9 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
 
     # Get real route
     route_geojson = get_directions_route(ordered_points)
+    line_coords = route_geojson["features"][0]["geometry"]["coordinates"]  # [ [lon, lat], ... ]
 
-    # Extract line geometry
-    line_coords = route_geojson["features"][0]["geometry"]["coordinates"]
-    route_points = [(lat, lon) for lon, lat in line_coords]
-
-    # Map centered on start
-    m = folium.Map(location=ordered_points[0], zoom_start=13)
-    # Add arrows
-    AntPath(route_points).add_to(m)
-    # Setup gradient
-    colors = get_gradient_colors(len(ordered_points))
-
-    # Load names from DB in one query
+    # Load names
     db = SessionLocal()
     profile_names = {}
     profiles_db = db.query(Profile).filter(Profile.id.in_(ordered_ids)).all()
@@ -247,23 +237,26 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
         profile_names[p.id] = p.name
     db.close()
 
-    # Stop markers with names
-    for idx, ((lat, lon), profile_id) in enumerate(zip(ordered_points[1:], ordered_ids), start=1):
-        name = profile_names.get(profile_id, "Unknown")
-        folium.Marker(
-            location=[lat, lon],
-            popup=f"Stop {idx}: {name}",
-            icon=folium.Icon(color=colors[idx],
-                             icon="info-sign" if idx > 0 else "play",
-                             prefix="glyphicon" if idx > 0 else "fa")
-        ).add_to(m)
+    markers = []
+    for (lat, lon), profile_id in zip(ordered_points[1:], ordered_ids):
+        markers.append({
+            "id": profile_id,
+            "name": profile_names.get(profile_id, "Unknown"),
+            "lat": lat,
+            "lon": lon
+        })
 
-    folium.PolyLine(route_points, color="red", weight=3).add_to(m)
-
-    m.save("route_map.html")
-    print("Map saved as route_map.html")
-
-    return route_geojson
+    return {
+        "start": {
+            "lat": start_coord[0],
+            "lon": start_coord[1]
+        },
+        "markers": markers,
+        "route": {
+            "type": "LineString",
+            "coordinates": line_coords  # Still [ [lon, lat], ... ]
+        }
+    }
 
 def test_map():
     # Example data:

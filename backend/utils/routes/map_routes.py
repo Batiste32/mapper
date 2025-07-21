@@ -1,4 +1,3 @@
-# routes/optimize.py
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
 from typing import Optional, List
@@ -73,6 +72,7 @@ def optimize_profiles(req: RouteRequest = Body(...)):
         )
         print("Clusters optimized, drawing map...")
         route_geojson = display_clustered_route(full_ordered_points, cluster_results, start_coord=start_coord)
+        print(route_geojson)
         return route_geojson
     
     print(f"Small batch: {len(points)} points. Single optimization...")
@@ -95,5 +95,5 @@ def optimize_profiles(req: RouteRequest = Body(...)):
         profiles_map,
         start_coord=start_coord
     )
-
+    print(route_geojson)
     return route_geojson
