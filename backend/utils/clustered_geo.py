@@ -128,6 +128,7 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
     profile_ids = [pid for _, cluster in cluster_results for pid in cluster]
     db = SessionLocal()
     profile_map = {p.id: p.name for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_arguments = {p.id : p.suggested_arguments for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     db.close()
 
     # Build marker list
@@ -143,6 +144,7 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
             markers.append({
                 "id": profile_id,
                 "name": profile_map.get(profile_id, "Unknown"),
+                "arguments": profile_arguments.get(profile_id, "None"),
                 "lat": lat,
                 "lon": lon,
                 "color": colors[point_idx]  # Optional gradient color

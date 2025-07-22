@@ -232,9 +232,11 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
     # Load names
     db = SessionLocal()
     profile_names = {}
+    profile_arguments = {}
     profiles_db = db.query(Profile).filter(Profile.id.in_(ordered_ids)).all()
     for p in profiles_db:
         profile_names[p.id] = p.name
+        profile_arguments[p.id] = p.suggested_arguments
     db.close()
 
     markers = []
@@ -242,6 +244,7 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
         markers.append({
             "id": profile_id,
             "name": profile_names.get(profile_id, "Unknown"),
+            "arguments": profile_arguments.get(profile_id, "None"),
             "lat": lat,
             "lon": lon
         })

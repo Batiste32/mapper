@@ -162,12 +162,12 @@ Map display using ```Leaflet```.
     uvicorn backend.main:app --reload
     ```
 
-3. **Register on the app**
+3. **Using the backend**
 
     When prompted, select option 2 (create admin account).
     Enter your username and password.
 
-4. **Use the endpoint**
+    - *Use the endpoint (for backend testing)*
 
     Authenticate by calling ```/auth/login``` with the username and password defined.
 
@@ -181,9 +181,27 @@ Map display using ```Leaflet```.
 
   **NB :** You can run the ```cli_tester.py``` file located in ```backend``` for easier use.
 
-## Future Improvements
+4. **Run the frontend app**
 
-- Interactive frontend with live map previews
+  The frontend can be launched using ```npm run dev``` while inside the ```frontend``` folder :
+
+  ```bash
+  cd mapper/frontend
+  npm run dev
+  ```
+
+  This will launch the app on local network at ```http://localhost:5173/```
+
+  ![Map preview Image](assets/map_example.png)
+
+5. **Using the app**
+
+  On the right of the page, you'll see a set of filtering options. Fill in some of the fields to select which part of the database to target. (Note that you can let any field blank to avoid filtering on them.)
+  Make sure the values fit the ones inside the database. ("Français" != "Française")
+  Then setup a starting adress or leave it blank to use your current position (will require access to your geolocation).
+  Press ```Search``` and the process will start. The path should soon appear with the markers corresponding to each profile selected in your database. Click on one of them to display details on the right panel.
+
+## Future Improvements
 
 - User authentication and saved preferences
 

@@ -7,6 +7,8 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+import PathAnim from "./PathAnim.tsx"
+
 // Fix Leaflet's default icon path
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -83,6 +85,7 @@ export default function App() {
       properties: {
         index: idx + 1,
         name: m.name,
+        arguments: m.arguments,
         id: m.id,
       },
     }));
@@ -144,12 +147,23 @@ export default function App() {
         <Marker position={start}>
           <Popup>Start Position</Popup>
         </Marker>
-
-        {/* ROUTE POLYLINE */}
-        {route && (
+        {/* ROUTE POLYLINE Deprecated*/}
+        {/* route && (
           <Polyline positions={route} color="blue" />
-        )}
-
+        )*/ }
+        { route && (<PathAnim
+          positions={route}
+          options={{
+            delay: 800,
+            dashArray: [10, 20],
+            weight: 5,
+            color: "#0078ff",
+            pulseColor: "#00f0ff",
+            paused: false,
+            reverse: false,
+            hardwareAccelerated: true,
+          }}
+        />) }
         {markers.map((m, idx) => (
           <Marker
             key={idx}
@@ -168,7 +182,7 @@ export default function App() {
       </MapContainer>
 
       {/* RIGHT PANEL */}
-      <div className="w-64 p-4 bg-white border-l overflow-y-auto">
+      <div className="w-64 p-4 bg-midnight border-l overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">Profile Info</h2>
         {selectedProfile ? (
           <div>
