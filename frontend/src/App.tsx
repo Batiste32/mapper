@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -21,6 +20,25 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+type LatLng = [number, number];
+
+type Marker = {
+  position: LatLng;
+  color: string;
+  properties: {
+    index: number;
+    array_id: string;
+    name: string;
+    arguments: any;
+    nbhood: string;
+    preferred_language: string;
+    origin: string;
+    political_scale: string;
+    ideal_process: string;
+    strategic_profile: string;
+  };
+};
+
 export default function App() {
   const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`;
   const [start, setStart] = useState([45.45, -73.64]);
@@ -29,8 +47,8 @@ export default function App() {
     political_alignment: "",
     min_score_vote: "",
   });
-  const [route, setRoute] = useState(null);
-  const [markers, setMarkers] = useState([]);
+  const [route, setRoute] = useState<LatLng[] | null>(null);
+  const [markers, setMarkers] = useState<Marker[]>([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [startAddress, setStartAddress] = useState("");
 
@@ -49,16 +67,46 @@ export default function App() {
     }
   }, [startAddress]);
 
+  useEffect(() => {
+    let watchId;
+
+    if (startAddress.trim() === "") {
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            const newPos = [latitude, longitude];
+
+            setStart(newPos);
+
+            setRoute((prevRoute) => {
+              if (!prevRoute) return null;
+              return trimRoute(newPos, prevRoute);
+            });
+          },
+          (err) => {
+            console.error("Geolocation error:", err);
+          },
+          { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+        );
+      }
+    }
+
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, [startAddress]);
+
   const fetchValidValues = async (field: string, setter: React.Dispatch<React.SetStateAction<never[]>>) => {
     try {
-    const res = await fetch(`http://localhost:8000/profiles/valid_values?field=${field}`);
-    const data = await res.json();
-    setter(data);
-  } catch (err) {
-    console.error(`Failed to fetch values for field "${field}":`, err);
-    setter([]);
-  }
-};
+      const res = await fetch(`http://localhost:8000/profiles/valid_values?field=${field}`);
+      const data = await res.json();
+      setter(data);
+    } catch (err) {
+      console.error(`Failed to fetch values for field "${field}":`, err);
+      setter([]);
+    }
+  };
 
   useEffect(() => {
     fetchValidValues("origin", setValidEthnicities);
@@ -84,9 +132,8 @@ export default function App() {
           alert("Address not found. Falling back to geolocation.");
         }
       } catch (error) {
-        console.error("Geocoding error:", error);
         alert("Geocoding failed. Falling back to geolocation.");
-        alert(error);
+        console.error("Geocoding error:", error);
       }
     }
     alert(`${API_BASE}/profiles/optimize`);
@@ -130,6 +177,16 @@ export default function App() {
 
   const ToggleProfileDisplay = (properties) => {
     setSelectedProfile((prev) => prev && prev.array_id === properties.array_id ? null : properties)
+  }
+
+  function trimRoute(currentPosition, route) {
+    const threshold = 0.0005; // approx 50m depending on lat/lon
+    return route.filter(([lat, lon]) => {
+      const dist = Math.sqrt(
+        Math.pow(currentPosition[0] - lat, 2) + Math.pow(currentPosition[1] - lon, 2)
+      );
+      return dist > threshold;
+    });
   }
 
   return (
