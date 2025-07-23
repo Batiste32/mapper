@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Query
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, List
-
+import httpx
 from sqlalchemy.orm import Session
+
 from backend.database import SessionLocal
 from backend.database.models import Profile
 from backend.utils.geo import get_optimized_route, display_route_on_map
@@ -97,3 +99,22 @@ def optimize_profiles(req: RouteRequest = Body(...)):
     )
     print(route_geojson)
     return route_geojson
+
+@router.get("/geocode")
+async def geocode_address(q: str = Query(..., description="The address to geocode")):
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={q}"
+
+    headers = {
+        "User-Agent": "YourAppName/1.0 (your@email.com)"  # Nominatim requires a real User-Agent
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return data
+        except httpx.RequestError as exc:
+            return JSONResponse(content={"error": f"Network error: {exc}"}, status_code=500)
+        except httpx.HTTPStatusError as exc:
+            return JSONResponse(content={"error": f"HTTP error: {exc.response.status_code}"}, status_code=exc.response.status_code)

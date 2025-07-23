@@ -40,3 +40,9 @@
 .read-the-docs {
   color: #888;
 }
+
+.panel-transition-width {
+  transition-property: width;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}
