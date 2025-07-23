@@ -233,10 +233,24 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
     db = SessionLocal()
     profile_names = {}
     profile_arguments = {}
+    profile_age = {}
+    profile_nbhood = {}
+    profile_preferred_language = {}
+    profile_origin = {}
+    profile_political_scale = {}
+    profile_ideal_process = {}
+    profile_strategic_profile = {}
     profiles_db = db.query(Profile).filter(Profile.id.in_(ordered_ids)).all()
     for p in profiles_db:
         profile_names[p.id] = p.name
         profile_arguments[p.id] = p.suggested_arguments
+        profile_age[p.id] = p.age
+        profile_nbhood[p.id] = p.nbhood
+        profile_preferred_language[p.id] = p.preferred_language
+        profile_origin[p.id] = p.origin
+        profile_political_scale[p.id] = p.political_scale
+        profile_ideal_process[p.id] = p.ideal_process
+        profile_strategic_profile[p.id] = p.strategic_profile
     db.close()
 
     markers = []
@@ -245,6 +259,13 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
             "id": profile_id,
             "name": profile_names.get(profile_id, "Unknown"),
             "arguments": profile_arguments.get(profile_id, "None"),
+            "age": profile_age.get(profile_id, "None"),
+            "nbhood": profile_nbhood.get(profile_id, "None"),
+            "preferred_language": profile_preferred_language.get(profile_id, "None"),
+            "origin": profile_origin.get(profile_id, "None"),
+            "political_scale": profile_political_scale.get(profile_id, "None"),
+            "ideal_process": profile_ideal_process.get(profile_id, "None"),
+            "strategic_profile": profile_strategic_profile.get(profile_id, "None"),
             "lat": lat,
             "lon": lon
         })

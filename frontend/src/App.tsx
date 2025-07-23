@@ -8,6 +8,7 @@ import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 import PathAnim from "./PathAnim.tsx"
+import AutocompleteInput from "./AutocompleteInput.tsx";
 
 // Fix Leaflet's default icon path
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,6 +31,10 @@ export default function App() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [startAddress, setStartAddress] = useState("");
 
+  /* Valid database input fields */
+  const [validEthnicities, setValidEthnicities] = useState([]);
+  const [validAlignments, setValidAlignments] = useState([]);
+
   useEffect(() => {
     if (!startAddress) {
       navigator.geolocation.getCurrentPosition(
@@ -40,6 +45,22 @@ export default function App() {
       );
     }
   }, [startAddress]);
+
+  const fetchValidValues = async (field: string, setter: React.Dispatch<React.SetStateAction<never[]>>) => {
+    try {
+    const res = await fetch(`http://localhost:8000/profiles/valid_values?field=${field}`);
+    const data = await res.json();
+    setter(data);
+  } catch (err) {
+    console.error(`Failed to fetch values for field "${field}":`, err);
+    setter([]);
+  }
+};
+
+  useEffect(() => {
+    fetchValidValues("origin", setValidEthnicities);
+    fetchValidValues("political_lean", setValidAlignments);
+  }, []);
 
   const handleSearch = async () => {
     let lat = start[0];
@@ -89,56 +110,55 @@ export default function App() {
       color: m.color,
       properties: {
         index: idx + 1,
+        array_id: m.id,
         name: m.name,
         arguments: m.arguments,
-        id: m.id,
+        nbhood: m.nbhood,
+        preferred_language: m.preferred_language,
+        origin: m.origin,
+        political_scale: m.political_scale,
+        ideal_process: m.ideal_process,
+        strategic_profile: m.strategic_profile,
       },
     }));
 
     setMarkers(markerList);
   };
 
+  const ToggleProfileDisplay = (properties) => {
+    setSelectedProfile((prev) => prev && prev.array_id === properties.array_id ? null : properties)
+  }
+
   return (
     <div className="flex flex-col sm:flex-row h-screen w-screen bg-midnight">
       
       {/* FILTER PANEL (Top on mobile, left on desktop) */}
-      <div className="w-full sm:w-64 p-4 bg-midnight border-b sm:border-b-0 sm:border-r max-h-[30vh] sm:max-h-none overflow-auto z-10">
-        <h2 className="text-xl font-semibold mb-4">Filters</h2>
-        <label className="block mb-2">
-          Ethnicity:
-          <input
-            className="w-full border rounded p-1"
-            value={filters.ethnicity}
-            onChange={(e) => setFilters({ ...filters, ethnicity: e.target.value })}
-          />
-        </label>
-        <label className="block mb-2">
-          Political Alignment:
-          <input
-            className="w-full border rounded p-1"
-            value={filters.political_alignment}
-            onChange={(e) => setFilters({ ...filters, political_alignment: e.target.value })}
-          />
-        </label>
-        <label className="block mb-2">
+      <div className="flex flex-col sm:w-64 p-4 bg-midnight border-b sm:border-b-0 sm:border-r max-h-[30vh] sm:max-h-none overflow-auto z-10">
+        <h2 className="flex-1 text-xl font-semibold mb-4">Filters</h2>
+        <AutocompleteInput label="Ethnicity" value={filters.ethnicity} onChange={(val) => setFilters({ ...filters, ethnicity: val })} suggestions={validEthnicities}/>
+        <AutocompleteInput label="Political Alignment" value={filters.political_alignment} onChange={(val) => setFilters({ ...filters, political_alignment: val })} suggestions={validAlignments}/>
+        <label className="flex-1 block mb-2">
           Min Vote Score:
           <input
             type="number"
-            className="w-full border rounded p-1"
+            className="flex-1 w-full border rounded p-1"
             value={filters.min_score_vote}
             onChange={(e) => setFilters({ ...filters, min_score_vote: parseFloat(e.target.value) })}
           />
         </label>
+        <label className="flex-1 block mb-2">
+          Start Adress :
         <input
           type="text"
           value={startAddress}
           onChange={(e) => setStartAddress(e.target.value)}
-          placeholder="Start address (leave blank to use GPS)"
-          className="border p-2 rounded w-full"
+          placeholder="(leave blank to use GPS)"
+          className="flex-1 border p-2 rounded w-full"
         />
+        </label>
         <button
           onClick={handleSearch}
-          className="mt-4 w-full bg-purple hover:bg-lavender text-white p-2 rounded"
+          className="flex-1 mt-4 w-full bg-purple hover:bg-lavender text-white p-2 rounded"
         >
           Search
         </button>
@@ -175,7 +195,7 @@ export default function App() {
               key={idx}
               position={m.position}
               eventHandlers={{
-                click: () => setSelectedProfile(m.properties),
+                click: () => ToggleProfileDisplay(m.properties),
               }}
             >
               <Popup>

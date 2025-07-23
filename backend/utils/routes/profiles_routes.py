@@ -96,3 +96,7 @@ def export_profiles(
         headers={"Content-Disposition": "attachment; filename=profiles.csv"}
     )
 
+@router.get("/valid_values")
+def get_valid_values(field: str, db: Session = Depends(get_db)):
+    values = db.query(getattr(Profile, field)).distinct().all()
+    return list({v[0] for v in values if v[0]})

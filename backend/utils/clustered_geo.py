@@ -129,6 +129,13 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
     db = SessionLocal()
     profile_map = {p.id: p.name for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     profile_arguments = {p.id : p.suggested_arguments for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_age = {p.id : p.age for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_nbhood = {p.id : p.nbhood for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_preferred_language = {p.id : p.preferred_language for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_origin = {p.id : p.origin for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_political_scale = {p.id : p.political_scale for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_ideal_process = {p.id : p.ideal_process for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_strategic_profile = {p.id : p.strategic_profile for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     db.close()
 
     # Build marker list
@@ -145,6 +152,13 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
                 "id": profile_id,
                 "name": profile_map.get(profile_id, "Unknown"),
                 "arguments": profile_arguments.get(profile_id, "None"),
+                "age": profile_age.get(profile_id, "None"),
+                "nbhood": profile_nbhood.get(profile_id, "None"),
+                "preferred_language": profile_preferred_language.get(profile_id, "None"),
+                "origin": profile_origin.get(profile_id, "None"),
+                "political_scale": profile_political_scale.get(profile_id, "None"),
+                "ideal_process": profile_ideal_process.get(profile_id, "None"),
+                "strategic_profile": profile_strategic_profile.get(profile_id, "None"),
                 "lat": lat,
                 "lon": lon,
                 "color": colors[point_idx]  # Optional gradient color
