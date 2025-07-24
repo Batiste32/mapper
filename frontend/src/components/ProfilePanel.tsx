@@ -7,7 +7,9 @@ export default function ProfilePanel( {selectedProfile} ){
             {selectedProfile ? (
             <div>
                 {Object.entries(selectedProfile).map(([k, v]) => (
-                <p key={k}><strong>{k}</strong>: {v}</p>
+                    <div className = "m-3">
+                        <p key={k}><strong>{k}</strong>: {v}</p>
+                    </div>
                 ))}
             </div>
             ) : (

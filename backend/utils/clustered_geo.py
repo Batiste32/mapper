@@ -1,6 +1,4 @@
 from sklearn.cluster import KMeans
-import requests
-import folium
 from geopy.distance import geodesic
 from backend.database import SessionLocal
 from backend.database.models import Profile
@@ -136,6 +134,7 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
     profile_political_scale = {p.id : p.political_scale for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     profile_ideal_process = {p.id : p.ideal_process for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     profile_strategic_profile = {p.id : p.strategic_profile for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
+    profile_personality = {p.id : p.personality for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
     db.close()
 
     # Build marker list
@@ -159,6 +158,7 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
                 "political_scale": profile_political_scale.get(profile_id, "None"),
                 "ideal_process": profile_ideal_process.get(profile_id, "None"),
                 "strategic_profile": profile_strategic_profile.get(profile_id, "None"),
+                "personality": profile_personality.get(profile_id, "None"),
                 "lat": lat,
                 "lon": lon,
                 "color": colors[point_idx]  # Optional gradient color

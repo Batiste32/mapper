@@ -3,8 +3,7 @@ import sys
 import csv
 
 from database.models import Engine, sessionmaker, Profile, isolate_stressed_element_in_field
-
-BASE_URL = "http://127.0.0.1:8000"
+from backend.utils.constants import BASE_URL
 
 def login():
     while True:

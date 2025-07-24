@@ -1,7 +1,8 @@
-from backend.database.models import *
+from backend.database.operations import reimport_database_field, import_data_from_csv, create_data_base, isolate_stressed_elements_in_field, normalize_string_value
 from backend.utils.routes import utils_routes, auth_routes, admin_routes, profiles_routes, visits_routes, map_routes
-from backend.utils.security import *
+from backend.utils.security import list_admins, create_admin, remove_admin, create_engine
 from backend.utils.geo import update_profiles_latlon_from_csv, test_map
+from backend.utils.constants import DATABASE_PATH, VALID_LEANS, VALID_NATIONALITIES
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,10 +16,10 @@ while init_loop :
 """1 : list admin accounts
 2 : create admin account
 3 : remove admin account
-4 : rebuild database (long process)
+4 : manage database
 5 : test folium optimized_route
 else : start app
-->""") :
+-> """) :
         case "1" :
             list_admins()
         case "2" :
@@ -28,14 +29,38 @@ else : start app
             remove_admin()
             print("Admin removed")
         case "4" :
-            try :
-                os.remove("backend/database/electoral_app.db")
-            except :
-                pass
-            engine = create_data_base()
-            import_data_from_csv(engine)
-            unresolved,total = update_profiles_latlon_from_csv(engine)
-            print(len(unresolved)," / ",total," missing")
+            print("Database management, select option :")
+            match input(
+"""1 : rebuild database (long process)
+2 : rebuild geolocation columns (lat, lon)
+3 : reparse string fields
+else : back to menu
+-> """) :
+                case "1" :
+                    try :
+                        os.remove(DATABASE_PATH)
+                    except :
+                        pass
+                    engine = create_data_base(DATABASE_PATH)
+                    import_data_from_csv(engine)
+                    unresolved,total = update_profiles_latlon_from_csv(engine)
+                    print(len(unresolved)," / ",total," missing geocoding")
+
+                case "2" :
+                    engine = create_engine(DATABASE_PATH)
+                    unresolved,total = update_profiles_latlon_from_csv(engine)
+                    print(len(unresolved)," / ",total," missing geocoding")
+
+                case "3" :
+                    reimport_database_field("profiles",["personnality","political_lean","origin"],
+                        [isolate_stressed_elements_in_field, 
+                         lambda x : normalize_string_value(x,VALID_LEANS,trim_at=3), 
+                         lambda x : normalize_string_value(x,VALID_NATIONALITIES)])
+                    print("String fields parsed")
+
+                case _ : 
+                    print("Returning to menu")
+                
         case "5" :
             test_map()
         case _ :

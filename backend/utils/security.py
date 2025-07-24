@@ -6,12 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.database.models import User
 from backend.database import SessionLocal
-
-SECRET_KEY = "YOUR_SECRET_KEY"
-ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImM1MWU3MzZiNjkyYTRhZWJhOWU4NTc3YzNmYmVjMWVlIiwiaCI6Im11cm11cjY0In0="
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+from backend.utils.constants import *
 
 def verify_password(plain_password, hashed_password):
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password)

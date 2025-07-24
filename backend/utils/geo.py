@@ -240,6 +240,7 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
     profile_political_scale = {}
     profile_ideal_process = {}
     profile_strategic_profile = {}
+    profile_personality = {}
     profiles_db = db.query(Profile).filter(Profile.id.in_(ordered_ids)).all()
     for p in profiles_db:
         profile_names[p.id] = p.name
@@ -251,6 +252,7 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
         profile_political_scale[p.id] = p.political_scale
         profile_ideal_process[p.id] = p.ideal_process
         profile_strategic_profile[p.id] = p.strategic_profile
+        profile_personality[p.id] = p.personality
     db.close()
 
     markers = []
@@ -266,6 +268,7 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
             "political_scale": profile_political_scale.get(profile_id, "None"),
             "ideal_process": profile_ideal_process.get(profile_id, "None"),
             "strategic_profile": profile_strategic_profile.get(profile_id, "None"),
+            "personality": profile_personality.get(profile_id, "None"),
             "lat": lat,
             "lon": lon
         })

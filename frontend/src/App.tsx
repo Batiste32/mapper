@@ -29,7 +29,8 @@ type Marker = {
     index: number;
     array_id: string;
     name: string;
-    arguments: any;
+    personality: string;
+    arguments: string;
     nbhood: string;
     preferred_language: string;
     origin: string;
@@ -162,6 +163,7 @@ export default function App() {
         index: idx + 1,
         array_id: m.id,
         name: m.name,
+        personality: m.personality,
         arguments: m.arguments,
         nbhood: m.nbhood,
         preferred_language: m.preferred_language,
