@@ -1,8 +1,6 @@
 import bcrypt
 from datetime import datetime, timedelta
 from jose import jwt
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from backend.database.models import User
 from backend.database import SessionLocal

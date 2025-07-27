@@ -1,3 +1,5 @@
+# Describes the structure of the database
+
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Text, Float, Index
 from sqlalchemy.orm import relationship
 from datetime import datetime

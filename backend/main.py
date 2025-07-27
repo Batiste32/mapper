@@ -1,11 +1,15 @@
-from backend.database.operations import reimport_database_field, import_data_from_csv, create_data_base, isolate_stressed_elements_in_field, normalize_string_value
+from backend.database.operations import parse_database_field, import_data_from_csv, reimport_column_from_csv, create_data_base, isolate_stressed_elements_in_field, normalize_string_value, compare_csv_to_db_column
+from backend.database.llm_operations import update_database_nationalities, llm_normalize_field_cached
+from backend.database.models import Profile
 from backend.utils.routes import utils_routes, auth_routes, admin_routes, profiles_routes, visits_routes, map_routes
-from backend.utils.security import list_admins, create_admin, remove_admin, create_engine
+from backend.utils.security import list_admins, create_admin, remove_admin
 from backend.utils.geo import update_profiles_latlon_from_csv, test_map
-from backend.utils.constants import DATABASE_PATH, VALID_LEANS, VALID_NATIONALITIES
+from backend.utils.constants import CSV_PATH, DATABASE_PATH, DATABASE_URL, VALID_LEANS, VALID_NATIONALITIES
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
 
 import os
 
@@ -33,7 +37,9 @@ else : start app
             match input(
 """1 : rebuild database (long process)
 2 : rebuild geolocation columns (lat, lon)
-3 : reparse string fields
+3 : reparse string fields (procedural method)
+4 : reparse nationality field (LLM method)
+5 : check nationality field modifications
 else : back to menu
 -> """) :
                 case "1" :
@@ -47,16 +53,32 @@ else : back to menu
                     print(len(unresolved)," / ",total," missing geocoding")
 
                 case "2" :
-                    engine = create_engine(DATABASE_PATH)
+                    engine = create_engine(DATABASE_URL)
                     unresolved,total = update_profiles_latlon_from_csv(engine)
                     print(len(unresolved)," / ",total," missing geocoding")
 
                 case "3" :
-                    reimport_database_field("profiles",["personnality","political_lean","origin"],
+                    parse_database_field("profiles",["personnality","political_lean","origin"],
                         [isolate_stressed_elements_in_field, 
                          lambda x : normalize_string_value(x,VALID_LEANS,trim_at=3), 
                          lambda x : normalize_string_value(x,VALID_NATIONALITIES)])
                     print("String fields parsed")
+
+                case "4" :
+                    engine = create_engine(DATABASE_URL)
+                    session = Session(engine)
+                    reimport_column_from_csv(CSV_PATH, "ORIGIN", "origin", DATABASE_PATH)
+                    normalized = llm_normalize_field_cached(session, "Profile", "origin", VALID_NATIONALITIES, batch_size=2)
+                    update_database_nationalities(session, normalized)
+
+                case "5" :
+                    engine = create_engine(DATABASE_URL)
+                    session = Session(engine)
+                    diffs = compare_csv_to_db_column(CSV_PATH,session,Profile,"uniqueid","origin","UNIQUEID","ORIGIN")
+                    print("Mismatch on IDs :")
+                    for uid, (csv_val, db_val) in diffs.items():
+                        print(f"{uid}: CSV='{csv_val}' vs DB='{db_val}'")
+                    print(f"Changed {len(diffs.keys())} elements")
 
                 case _ : 
                     print("Returning to menu")

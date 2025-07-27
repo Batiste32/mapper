@@ -11,3 +11,4 @@ scikit-learn
 geopy
 httpx
 rapidfuzz
+pandas

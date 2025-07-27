@@ -6,9 +6,10 @@ from sqlalchemy.engine.base import Engine
 import csv
 import bcrypt
 import re # regex to cleanup data
-from typing import Callable
+from typing import Callable, Type
 from rapidfuzz import process, fuzz
 from pathlib import Path
+from pandas import read_csv
 
 from backend.utils.constants import *
 from backend.database.schema import Base
@@ -55,7 +56,7 @@ def import_data_from_csv(engine: Engine, filepath: str = "backend/database/profi
     session.commit()
     print("Imported profiles!")
 
-def reimport_database_field(table_name:str,fields:list[str],edits:list[Callable],database_path:str="backend/database/electoral_app.db"):
+def parse_database_field(table_name:str,fields:list[str],edits:list[Callable],database_path:str="backend/database/electoral_app.db"):
     """
     Edits rows in an SQLite database by applying transformation functions to specified fields.
 
@@ -159,3 +160,84 @@ def normalize_string_value(value: str, allowed_values: list[str], score_cutoff: 
     else :
         print(f"[normalize_string_value] No match for '{trimmed_value}' (original: '{value}') among allowed values.")
         return trimmed_value
+
+def reimport_column_from_csv(csv_path: str, csv_column_name:str, db_column_name: str, database_path: str):
+    """
+    Reimports a specific column from a CSV file and updates the corresponding
+    rows in the database.
+
+    Args:
+        csv_path: Path to the CSV file.
+        csv_column_name: The column to import from the CSV.
+        db_column_name: The column to replace in the DB.
+        database_path: Path to the SQLite database.
+    """
+    # Load the column from CSV
+    df = read_csv(csv_path, usecols=["UNIQUEID", csv_column_name])
+    
+    if df[csv_column_name].isnull().any():
+        print(f"Warning: Missing values found in column '{csv_column_name}'")
+
+    # Connect to database
+    engine = create_engine(f"sqlite:///{database_path}")
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    try:
+        for _, row in df.iterrows():
+            stmt = (
+                update(Profile)
+                .where(Profile.uniqueid == row["UNIQUEID"])
+                .values({db_column_name: row[csv_column_name]})
+            )
+            session.execute(stmt)
+
+        session.commit()
+        print(f"Column '{db_column_name}' successfully reimported from {csv_path} : {csv_column_name}")
+
+    except Exception as e:
+        session.rollback()
+        print(f"Error during update: {e}")
+    finally:
+        session.close()
+
+def compare_csv_to_db_column( csv_path: str, session: Session, model: Type, id_column: str, field_column: str,
+                              csv_id_column: str, csv_field_column: str ) -> dict[str, list[str]] :
+    """
+    Compare a specific column between a CSV file and a SQLAlchemy database table.
+
+    Args :
+        csv_path (str) : Path to the CSV file.
+        session (Session) : SQLAlchemy session.
+        model (Type) : SQLAlchemy model class.
+        id_column (str) : Name of the unique identifier column (model).
+        field_column (str) : Name of the column to compare (model).
+        csv_id_column (str) : Name of the unique identifier column (csv file).
+        csv_field_column (str) : Name of the column to compare (csv file).
+
+    Returns :
+        dict[str, list[str]]: Dictionary mapping unique_id -> [csv_value, db_value]
+                              where the values differ.
+    """
+    
+    with open(csv_path, newline='', encoding="utf-8") as f :
+        reader = csv.DictReader(f)
+        csv_data = {row[csv_id_column]: row[csv_field_column] for row in reader if row.get(csv_id_column) and row.get(csv_field_column)}
+
+    # Query all matching db rows in one go
+    ids = list(csv_data.keys())
+    stmt = select(getattr(model, id_column), getattr(model, field_column)).where(getattr(model, id_column).in_(ids))
+    results = session.execute(stmt).all()
+    db_results = {
+        str(getattr(row, id_column)): str(getattr(row, field_column))
+        for row in results
+    }
+
+    # Compare and collect mismatches
+    differences = {}
+    for uid, csv_val in csv_data.items() :
+        db_val = db_results.get(uid)
+        if db_val is not None and str(csv_val).strip() != str(db_val).strip() :
+            differences[uid] = [csv_val, db_val]
+
+    return differences

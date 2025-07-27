@@ -1,5 +1,7 @@
 # Paths
 DATABASE_PATH = "backend/database/electoral_app.db"
+CSV_PATH = "backend/database/profiles.csv"
+CACHE_PATH = "backend/cache"
 
 # URLs
 BASE_URL = "http://127.0.0.1:8000"
@@ -39,6 +41,13 @@ VALID_NATIONALITIES = ["Afghane", "Albanaise", "Algérienne", "Allemande", "Amé
     "Timoraise", "Togolaise", "Tongienne", "Trinidadienne", "Tunisienne", "Turkmène",
     "Turque", "Tuvaluane", "Ukrainienne", "Uruguayenne", "Vanuataise", "Vénézuélienne",
     "Vietnamienne", "Yéménite", "Zambienne", "Zimbabwéenne"]
+
+PARSING_PROMPT = """
+Identify the following data to one of the provided values.
+Return the data as it is if you can't.
+- DO NOT EXPLAIN ANYTHING.
+- NO BULLET POINTS, NO HEADERS, NO EXTRA TEXT.
+- SEPARATE ENTRIES WITH ;"""
 
 # Tokens
 SECRET_KEY = "YOUR_SECRET_KEY"
