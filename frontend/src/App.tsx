@@ -100,7 +100,7 @@ export default function App() {
 
   const fetchValidValues = async (field: string, setter: React.Dispatch<React.SetStateAction<never[]>>) => {
     try {
-      const res = await fetch(`http://localhost:8000/profiles/valid_values?field=${field}`);
+      const res = await fetch(`${API_BASE}/profiles/valid_values?field=${field}`);
       const data = await res.json();
       setter(data);
     } catch (err) {
