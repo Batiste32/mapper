@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.responses import StreamingResponse
 import csv
@@ -98,5 +98,7 @@ def export_profiles(
 
 @router.get("/valid_values")
 def get_valid_values(field: str, db: Session = Depends(get_db)):
+    if not hasattr(Profile, field):
+        raise HTTPException(status_code=400, detail=f"Invalid field: {field}")
     values = db.query(getattr(Profile, field)).distinct().all()
     return list({v[0] for v in values if v[0]})

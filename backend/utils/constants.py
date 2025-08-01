@@ -1,11 +1,16 @@
 # Paths
+ENV_PATH = "frontend/.env"
 DATABASE_PATH = "backend/database/electoral_app.db"
 CSV_PATH = "backend/database/profiles.csv"
 CACHE_PATH = "backend/cache"
+NGROK_CONFIG_PATH = "backend/ngrok_config.yml"
+VITE_CONFIG_PATH = "frontend/vite.config.ts"
+CONSTANTS_PATH = "backend/utils/constants.py"
 
 # URLs
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://31738ea11dc4.ngrok-free.app"
 DATABASE_URL = "sqlite:///backend/database/electoral_app.db"
+NGROK_API_URL = "http://localhost:4040/api/tunnels"
 
 # Strings
 VALID_LEANS = ["extreme gauche", "gauche", "gauche centre", "centre", "centre droite", "droite", "extreme droite", "indeterminee"]

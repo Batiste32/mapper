@@ -41,7 +41,7 @@ type Marker = {
 };
 
 export default function App() {
-  const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000`;
+  const API_BASE = import.meta.env.VITE_API_BASE;
   const [start, setStart] = useState([45.45, -73.64]);
   const [filters, setFilters] = useState({
     ethnicity: "",
@@ -100,7 +100,15 @@ export default function App() {
 
   const fetchValidValues = async (field: string, setter: React.Dispatch<React.SetStateAction<never[]>>) => {
     try {
-      const res = await fetch(`${API_BASE}/profiles/valid_values?field=${field}`);
+      const res = await fetch(`${API_BASE}/profiles/valid_values?field=${field}`,
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      console.log(res)
       const data = await res.json();
       setter(data);
     } catch (err) {
@@ -118,11 +126,15 @@ export default function App() {
     let lat = start[0];
     let lon = start[1];
 
-    // If user entered an address, geocode it via your FastAPI backend
     if (startAddress.trim()) {
       try {
         const geoRes = await fetch(
-          `${API_BASE}/geocode?q=${encodeURIComponent(startAddress)}`
+          `${API_BASE}/geocode?q=${encodeURIComponent(startAddress)}`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
         );
         const geoData = await geoRes.json();
 
@@ -137,14 +149,18 @@ export default function App() {
         console.error("Geocoding error:", error);
       }
     }
-    alert(`${API_BASE}/profiles/optimize`);
+    console.log("Sending filters :", {
+      ...filters,
+      start_lat: lat,
+      start_lon: lon,
+    });
     const res = await fetch(`${API_BASE}/profiles/optimize`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
       body: JSON.stringify({
         ...filters,
-        start_lat: lat,
-        start_lon: lon,
+        start_lat: lat ?? 0,
+        start_lon: lon ?? 0,
       }),
     });
 

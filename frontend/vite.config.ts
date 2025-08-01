@@ -8,7 +8,14 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-  host: true,
-  port: 5173,
+    host: true,
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: "https://cccf686aa06d.ngrok-free.app",
+        changeOrigin: true,
+      },
+    },
+    allowedHosts: ["cccf686aa06d.ngrok-free.app"]
   },
 })
