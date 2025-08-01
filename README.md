@@ -3,6 +3,13 @@
 This project is a FastAPI-based tool that helps plan the most efficient route to visit a series of user profiles based on filtering criteria such as ethnicity, political alignment, or voting score. It leverages geolocation data, clustering, and real road optimization via the OpenRouteService API to return a highly usable, visually intuitive route map as well as providing useful insights regarding the profiles. The app's calls are accessible outside local network by using ngrok tunnels.
 
 ---
+## Table of Contents 
+- [Purpose](#purpose) 
+- [Features](#features) 
+- [Technologies Used](#technologies-used) 
+- [Setup & Usage](#setup--usage)
+- [Future Improvements](#future-improvements)
+
 
 ## Purpose
 
@@ -42,13 +49,13 @@ The purpose of this project is to:
 | `THIRD_PHONE`          | string          | Nullable, Optional                    |
 | `MAIN_MAIL`            | string          | Email, Unique                         |
 | `SECOND_MAIL`          | string          | Email, Nullable                       |
-| `CIVIC`                | string          | Civic number/address ID               |
+| `CIVIC`                | string          | Civic number/adress ID               |
 | `APP`                  | string          | Apartment info, Nullable              |
 | `STREET`               | string          | Street name                           |
 | `STREET_TYPE`          | string          | e.g., Avenue, Rue, Blvd               |
 | `CITY`                 | string          | Required                              |
 | `CP`                   | string          | Postal Code                           |
-| `ADRESS`               | string          | Full address (may be redundant)       |
+| `ADRESS`               | string          | Full adress (may be redundant)       |
 | `ANTICIPATED_VOTE`     | string          | Nullable, Expected vote               |
 | `2017_RESULTS`         | string          | Nullable, Voting history              |
 | `POLITICAL_PROFILE`    | string          | Nullable, Label or score range        |

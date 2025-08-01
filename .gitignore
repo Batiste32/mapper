@@ -2,3 +2,6 @@
 backend/database/electoral_app.db
 backend/database/main_dataset_loyola_prediction.xlsx
 backend/database/profiles.csv
+backend/__pycache__/
+backend/utils/__pycache__/
+backend/utils/routes/__pycache__/
