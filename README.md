@@ -1,6 +1,6 @@
 # Optimized Route Planner for Profile Visits
 
-This project is a FastAPI-based backend tool that helps plan the most efficient route to visit a series of user profiles based on filtering criteria such as ethnicity, political alignment, or voting score. It leverages geolocation data, clustering, and real road optimization via the OpenRouteService API to return a highly usable, visually intuitive route map as well as providing useful insights regarding the profiles.
+This project is a FastAPI-based tool that helps plan the most efficient route to visit a series of user profiles based on filtering criteria such as ethnicity, political alignment, or voting score. It leverages geolocation data, clustering, and real road optimization via the OpenRouteService API to return a highly usable, visually intuitive route map as well as providing useful insights regarding the profiles. The app's calls are accessible outside local network by using ngrok tunnels.
 
 ---
 
@@ -12,6 +12,7 @@ The purpose of this project is to:
 - Plan an optimized real-road route starting from a given coordinate
 - Visualize the path clearly with direction arrows and color-coded markers
 - Handle large datasets efficiently by clustering the points when API limits are reached
+- Allow an external user to connect and follow the route
 
 ---
 
@@ -93,15 +94,16 @@ The purpose of this project is to:
 
 ### Intelligent Batching
 
-- Automatically clusters points when over 60 locations are passed
+- Automatically clusters points when over 30 locations are passed
 - Prevents API request overload while preserving geographic locality
 
 ### Interactive Mapping
 
-- Uses [Folium](https://python-visualization.github.io/folium/) to generate route maps
-- Arrows on the route using animated `AntPath`
-- Start point highlighted in green
-- Other markers colored in a green-to-blue gradient to visualize visit order
+- Uses Leaflet to display the resulting path on an interactive map
+- Path animated using `AntPath`
+- Start point highlighted in red
+- Other markers colored in blue
+- Markers are interactive, allowing the user to view the informations for each profile
 
 ### API Endpoint
 
@@ -127,6 +129,7 @@ The purpose of this project is to:
 ```Python``` backend, provided by ```FastAPI```, using ```sqlalchemy``` for database management.
 Route optimization made with ```ORS```.
 Authentication using ```jwt``` and ```bcrypt```.
+LLM implementation using ```Ollama```.
 
 ### Database :
 
@@ -139,7 +142,15 @@ Map display using ```Leaflet```.
 
 ---
 
-## 📦 Setup & Usage
+### Networking :
+
+```ngrok``` implementation exposes the local access to public URLs, allowing the user to connect remotely.
+```batch``` launcher setupping the tunnels, updating the URLs and launching each part correctly.
+
+```localhost:5173``` : frontend
+```localhost:8000``` : backend
+
+## Setup & Usage
 
 0. **(Recommended) Setup a venv environment.**
 
@@ -183,21 +194,15 @@ Map display using ```Leaflet```.
 
 4. **Run the frontend app**
 
-  The frontend can be launched using ```npm run dev``` while inside the ```frontend``` folder :
+  The frontend can be launched using the ```ngrok_launcher.bat``` file. This will run the ```ngrok_tunneler.py``` file located under ```backend``` and setup the ngrok processes. The terminal will split into 3, allowing logging of the ngrok tunnels, python backend and vite frontend.
 
-  ```bash
-  cd mapper/frontend
-  npm run dev
-  ```
-
-  This will launch the app on local network at ```http://localhost:5173/```
-
-  ![Map preview Image](assets/map_example.png)
+  To access the app, find in the ngrok terminal the URL redirecting to port ```5173``` : this is the frontend.
 
 5. **Using the app**
 
-  On the right of the page, you'll see a set of filtering options. Fill in some of the fields to select which part of the database to target. (Note that you can let any field blank to avoid filtering on them.)
-  Make sure the values fit the ones inside the database. ("Français" != "Française")
+  ![Map preview Image](assets/map_example.png)
+  On the left of the page, you'll see a set of filtering options. Fill in some of the fields to select which part of the database to target. (Note that you can let any field blank to avoid filtering on them.)
+  Make sure the values fit the ones inside the database. ("Français" != "Française") An autocompletion widget will appear when you select any of the fields, to ensure your value does exist.
   Then setup a starting adress or leave it blank to use your current position (will require access to your geolocation).
   Press ```Search``` and the process will start. The path should soon appear with the markers corresponding to each profile selected in your database. Click on one of them to display details on the right panel.
 
@@ -208,3 +213,5 @@ Map display using ```Leaflet```.
 - Exportable map/report PDF
 
 - Better marker clustering for extremely dense zones
+
+- LLM insights enhancements, live base actualization
