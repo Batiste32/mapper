@@ -1,9 +1,12 @@
 from fastapi import Header, HTTPException, Depends
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+import os
+from dotenv import load_dotenv
+
 from backend.database import SessionLocal
 from backend.database.models import User, Device
-from backend.utils.security import SECRET_KEY, ALGORITHM
+from backend.utils.security import JWT_SECRET_KEY, ALGORITHM
 
 def get_db():
     db = SessionLocal()
@@ -17,12 +20,18 @@ def get_current_user(
     device_token: str = Header(...),
     db: Session = Depends(get_db)
 ):
+    
+    load_dotenv()
+
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    ALGORITHM = os.getenv("ALGORITHM", "HS256")
+
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid auth header")
     token = authorization.split(" ")[1]
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token payload")
