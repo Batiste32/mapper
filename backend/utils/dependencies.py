@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 from backend.database import SessionLocal
 from backend.database.models import User, Device
-from backend.utils.security import JWT_SECRET_KEY, ALGORITHM
 
 def get_db():
     db = SessionLocal()
