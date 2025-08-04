@@ -1,12 +1,12 @@
 from math import radians, cos, sin, asin, sqrt
 import requests
 import csv
-import folium
-from folium.plugins import AntPath
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
+
 from backend.database.models import Profile
 from backend.database import SessionLocal
-from backend.utils.security import ORS_API_KEY
 
 def haversine(lat1, lon1, lat2, lon2):
     # rayon de la Terre en km
@@ -111,6 +111,11 @@ def get_optimized_route(start_lat,start_lon,points,profile_ids,lat_first=True,lo
     lat_first = coordinates start with latitude ?
     loop_at_start = should the route loop back at starting position ?
     """
+
+    load_dotenv()
+
+    ORS_API_KEY = os.getenv("ORS_API_KEY")
+
     url = "https://api.openrouteservice.org/optimization"
     headers = {
         "Authorization": ORS_API_KEY,
