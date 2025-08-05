@@ -58,6 +58,7 @@ type MarkerData = {
 
 export default function App() {
   const API_BASE = import.meta.env.VITE_API_BASE;
+  console.log("API_BASE:", import.meta.env.VITE_API_BASE);
   const [start, setStart] = useState<LatLng>([45.45, -73.64]);
   const [filters, setFilters] = useState({
     ethnicity: "",
