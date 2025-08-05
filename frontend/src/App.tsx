@@ -6,9 +6,9 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-import FilterPanel from "./components/FilterPanel.tsx";
-import MapPanel from "./components/MapPanel.tsx";
-import ProfilePanel from "./components/ProfilePanel.tsx";
+import FilterPanel from "./components/FilterPanel";
+import MapPanel from "./components/MapPanel";
+import ProfilePanel from "./components/ProfilePanel";
 
 import './App.css'
 
