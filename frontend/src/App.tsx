@@ -13,7 +13,7 @@ import ProfilePanel from "./components/ProfilePanel.tsx";
 import './App.css'
 
 // Fix Leaflet's default icon path
-delete L.Icon.Default.prototype._getIconUrl;
+(L.Icon.Default.prototype as any)._getIconUrl = undefined;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
@@ -40,9 +40,25 @@ type Marker = {
   };
 };
 
+type MarkerData = {
+  lat: number;
+  lon: number;
+  color: string;
+  id: string;
+  name: string;
+  personality: string;
+  arguments: string;
+  nbhood: string;
+  preferred_language: string;
+  origin: string;
+  political_scale: string;
+  ideal_process: string;
+  strategic_profile: string;
+};
+
 export default function App() {
   const API_BASE = import.meta.env.VITE_API_BASE;
-  const [start, setStart] = useState([45.45, -73.64]);
+  const [start, setStart] = useState<LatLng>([45.45, -73.64]);
   const [filters, setFilters] = useState({
     ethnicity: "",
     political_alignment: "",
@@ -50,7 +66,7 @@ export default function App() {
   });
   const [route, setRoute] = useState<LatLng[] | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
-  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState<Marker["properties"] | null>(null);
   const [startAddress, setStartAddress] = useState("");
 
   /* Valid database input fields */
@@ -69,14 +85,14 @@ export default function App() {
   }, [startAddress]);
 
   useEffect(() => {
-    let watchId;
+    let watchId: number;
 
     if (startAddress.trim() === "") {
       if (navigator.geolocation) {
         watchId = navigator.geolocation.watchPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            const newPos = [latitude, longitude];
+            const newPos: LatLng = [latitude, longitude];
 
             setStart(newPos);
 
@@ -123,8 +139,8 @@ export default function App() {
   }, []);
 
   const handleSearch = async () => {
-    let lat = start[0];
-    let lon = start[1];
+    let lat: number = start[0];
+    let lon: number = start[1];
 
     if (startAddress.trim()) {
       try {
@@ -169,10 +185,10 @@ export default function App() {
 
     setStart([data.start.lat, data.start.lon]);
 
-    const routeLatLng = data.route.coordinates.map(([lon, lat]) => [lat, lon]);
+    const routeLatLng = data.route.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
     setRoute(routeLatLng);
 
-    const markerList = data.markers.map((m, idx) => ({
+    const markerList = data.markers.map((m: MarkerData, idx: number) => ({
       position: [m.lat, m.lon],
       color: m.color,
       properties: {
@@ -192,12 +208,12 @@ export default function App() {
 
     setMarkers(markerList);
   };
+  
+  const ToggleProfileDisplay = (properties: Marker["properties"]) => {
+    setSelectedProfile((prev) => prev && prev.array_id === properties.array_id ? null : properties);
+  };
 
-  const ToggleProfileDisplay = (properties) => {
-    setSelectedProfile((prev) => prev && prev.array_id === properties.array_id ? null : properties)
-  }
-
-  function trimRoute(currentPosition, route) {
+  function trimRoute(currentPosition: LatLng, route: LatLng[]) {
     const threshold = 0.0005; // approx 50m depending on lat/lon
     return route.filter(([lat, lon]) => {
       const dist = Math.sqrt(

@@ -1,7 +1,17 @@
 import AutocompleteInput from "./AutocompleteInput";
 
+interface FilterPanelProps {
+  filters: any;
+  setFilters: React.Dispatch<React.SetStateAction<any>>;
+  startAddress: string;
+  setStartAddress: (value: string) => void;
+  handleSearch: () => void;
+  validEthnicities: string[];
+  validAlignments: string[];
+}
+
 export default function FilterPanel( 
-    { filters, setFilters, startAddress, setStartAddress, handleSearch, validEthnicities, validAlignments } ){
+    { filters, setFilters, startAddress, setStartAddress, handleSearch, validEthnicities, validAlignments }: FilterPanelProps ){
 
     return(
         <div className="flex flex-col sm:w-64 p-4 bg-midnight border-b sm:border-b-0 sm:border-r max-h-[30vh] sm:max-h-none overflow-auto z-10">
