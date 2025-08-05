@@ -1,8 +1,6 @@
 import requests
 import sys
-import csv
 
-from database.models import Engine, sessionmaker, Profile, isolate_stressed_element_in_field
 from backend.utils.constants import BASE_URL
 
 def login():

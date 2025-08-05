@@ -176,8 +176,10 @@ Map display using ```Leaflet```.
 
 2. **Run the FastAPI app**
 
+    The ```cli.py``` file is used to launch and manage the backend locally.
+
     ```bash
-    uvicorn backend.main:app --reload
+    uvicorn backend.cli:app --reload
     ```
 
 3. **Using the backend**
