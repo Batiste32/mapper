@@ -20,5 +20,6 @@ def run_fastapi_app():
     app.include_router(profiles_routes.router)
     app.include_router(visits_routes.router)
     app.include_router(map_routes.router)
+    return app
 
-run_fastapi_app()
+app = run_fastapi_app()

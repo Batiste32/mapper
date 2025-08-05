@@ -89,4 +89,4 @@ else : back to menu
                 init_loop = False
 
 launch_cli()
-run_fastapi_app()
+app = run_fastapi_app()
