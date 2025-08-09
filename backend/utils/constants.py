@@ -8,7 +8,7 @@ VITE_CONFIG_PATH = "frontend/vite.config.ts"
 CONSTANTS_PATH = "backend/utils/constants.py"
 
 # URLs
-BASE_URL = "https://31738ea11dc4.ngrok-free.app"
+BASE_URL = "https://e053cf88935f.ngrok-free.app"
 DATABASE_URL = "sqlite:///backend/database/electoral_app.db"
 NGROK_API_URL = "http://localhost:4040/api/tunnels"
 

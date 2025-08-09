@@ -6,3 +6,4 @@ backend/__pycache__/
 backend/utils/__pycache__/
 backend/utils/routes/__pycache__/
 backend/.env
+frontend/.env
