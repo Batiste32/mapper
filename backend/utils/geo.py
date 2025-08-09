@@ -111,11 +111,14 @@ def get_optimized_route(start_lat,start_lon,points,profile_ids,lat_first=True,lo
     lat_first = coordinates start with latitude ?
     loop_at_start = should the route loop back at starting position ?
     """
-
-    load_dotenv()
+    try :
+        load_dotenv("/etc/secrets/.env")
+    except :
+        print("Warning, couldn't load Render env file.\nIgnore if running on local.")
 
     ORS_API_KEY = os.getenv("ORS_API_KEY")
-    print(ORS_API_KEY)
+    if not ORS_API_KEY:
+        raise RuntimeError("ORS_API_KEY environment variable is missing.")
 
     url = "https://api.openrouteservice.org/optimization"
     headers = {
@@ -167,9 +170,15 @@ def get_directions_route(ordered_points):
     Uses real roads/paths to follow.
     ordered_points: list of (lat, lon) tuples in the optimized order.
     """
-    load_dotenv()
+    try :
+        load_dotenv("/etc/secrets/.env")
+    except :
+        print("Warning, couldn't load Render env file.\nIgnore if running on local.")
 
     ORS_API_KEY = os.getenv("ORS_API_KEY")
+    if not ORS_API_KEY:
+        raise RuntimeError("ORS_API_KEY environment variable is missing.")
+
     url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
     headers = {
         "Authorization": ORS_API_KEY,
