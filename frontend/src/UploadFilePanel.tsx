@@ -18,6 +18,7 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
     const formData = new FormData();
     formData.append("file", file);
 
+    console.log(`${import.meta.env.VITE_API_BASE}`);
     const endpoint =
       fileType === "csv"
         ? `${import.meta.env.VITE_API_BASE}/upload_csv`

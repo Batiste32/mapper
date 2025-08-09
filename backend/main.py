@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.utils.routes import utils_routes, auth_routes, admin_routes, profiles_routes, visits_routes, map_routes
+from backend.utils.routes import utils_routes, auth_routes, admin_routes, profiles_routes, visits_routes, map_routes, database_routes
 
 def run_fastapi_app():
     app = FastAPI(title="Electoral Field App API")
@@ -20,6 +20,7 @@ def run_fastapi_app():
     app.include_router(profiles_routes.router)
     app.include_router(visits_routes.router)
     app.include_router(map_routes.router)
+    app.include_router(database_routes.router)
     return app
 
 app = run_fastapi_app()
