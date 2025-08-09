@@ -115,6 +115,7 @@ def get_optimized_route(start_lat,start_lon,points,profile_ids,lat_first=True,lo
     load_dotenv()
 
     ORS_API_KEY = os.getenv("ORS_API_KEY")
+    print(ORS_API_KEY)
 
     url = "https://api.openrouteservice.org/optimization"
     headers = {
