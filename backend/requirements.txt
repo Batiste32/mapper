@@ -12,3 +12,4 @@ geopy
 httpx
 rapidfuzz
 pandas
+python-multipart
