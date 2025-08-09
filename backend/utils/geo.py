@@ -166,6 +166,9 @@ def get_directions_route(ordered_points):
     Uses real roads/paths to follow.
     ordered_points: list of (lat, lon) tuples in the optimized order.
     """
+    load_dotenv()
+
+    ORS_API_KEY = os.getenv("ORS_API_KEY")
     url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
     headers = {
         "Authorization": ORS_API_KEY,
