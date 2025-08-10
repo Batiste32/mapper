@@ -108,7 +108,7 @@ export default function UploadFilePanel({
         <button
           onClick={proceed}
           className={`flex-1 p-4 m-4 rounded text-white ${ csvLoaded && sqlLoaded ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed" }`}
-          /*disabled={!csvLoaded || !sqlLoaded}*/
+          disabled={!csvLoaded || !sqlLoaded}
         >
           Proceed to Mapper
         </button>
