@@ -6,7 +6,7 @@ import App from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <div className="w-screen h-screen">
+    <div className="bg-midnight h-lvh w-full" id="main-div">
       <App />
     </div>
   </StrictMode>,

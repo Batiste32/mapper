@@ -10,8 +10,8 @@ export default function App() {
   const [csvLoaded, setCsvLoaded] = useState<boolean>(false);
   const [view, setView] = useState<"upload" | "mapper">("upload");
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Intelligent Mapper</h1>
+    <>
+      <h1 className="text-2xl font-bold m-4 bg-purple p-4 rounded">Intelligent Mapper</h1>
       {view === "upload" && (
         <UploadFilePanel
           sqlLoaded={sqlLoaded}
@@ -24,6 +24,6 @@ export default function App() {
       {view === "mapper" && (
         <Mapper goBack={() => setView("upload")} />
       )}
-    </div>
+    </>
   );
 }

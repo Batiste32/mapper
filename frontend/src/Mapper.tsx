@@ -229,17 +229,17 @@ export default function Mapper({ goBack }: Props) {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row h-screen w-screen bg-midnight">
-      <h2 className="text-xl font-bold mb-4">Mapper</h2>
-      <FilterPanel filters={filters} setFilters={setFilters}
-        startAddress={startAddress} setStartAddress={setStartAddress} handleSearch={handleSearch} 
-        validEthnicities={validEthnicities} validAlignments={validAlignments}/>
+    <div className="flex flex-col h-full bg-midnight" id="mapper-main">
+      <div className="flex-1 flex flex-col sm:flex-row bg-midnight" id="panels-layout">
+        <FilterPanel filters={filters} setFilters={setFilters}
+          startAddress={startAddress} setStartAddress={setStartAddress} handleSearch={handleSearch} 
+          validEthnicities={validEthnicities} validAlignments={validAlignments}/>
 
-      <MapPanel start={start} route={route} markers={markers} selectedProfile={selectedProfile} ToggleProfileDisplay={ToggleProfileDisplay} />
+        <MapPanel start={start} route={route} markers={markers} selectedProfile={selectedProfile} ToggleProfileDisplay={ToggleProfileDisplay} />
 
-      <ProfilePanel selectedProfile={selectedProfile} />
-
-      <button onClick={goBack} className="px-4 py-2 bg-blue-500 text-white rounded">
+        <ProfilePanel selectedProfile={selectedProfile} />
+      </div>
+      <button onClick={goBack} className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded">
         Back to Upload
       </button>
     </div>

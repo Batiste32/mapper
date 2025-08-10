@@ -8,17 +8,32 @@ type Props = {
   proceed: () => void;
 };
 
-export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, setCsvLoaded, proceed }: Props) {
+export default function UploadFilePanel({
+  sqlLoaded,
+  csvLoaded,
+  setSqlLoaded,
+  setCsvLoaded,
+  proceed,
+}: Props) {
   const [fileType, setFileType] = useState<"csv" | "db">("csv");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Step 1: Just store the file when selected
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+  };
+
+  // Step 2: Upload when clicking the button
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("Please select a file first.");
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", selectedFile);
 
-    console.log(`${import.meta.env.VITE_API_BASE}`);
     const endpoint =
       fileType === "csv"
         ? `${import.meta.env.VITE_API_BASE}/upload_csv`
@@ -37,6 +52,7 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
       else setSqlLoaded(true);
 
       alert("Upload successful!");
+      setSelectedFile(null);
     } catch (err) {
       console.error("Upload error:", err);
       alert("Upload failed.");
@@ -47,39 +63,56 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
     <div className="p-4 bg-purple rounded shadow-md mb-6">
       <h2 className="text-lg font-bold mb-2">Upload Files</h2>
 
-      {/* Status indicators */}
       <div className="mb-4">
-        <p>CSV file loaded: <span className={csvLoaded ? "text-green-500" : "text-red-500"}>{csvLoaded ? "Yes" : "No"}</span></p>
-        <p>SQL file loaded: <span className={sqlLoaded ? "text-green-500" : "text-red-500"}>{sqlLoaded ? "Yes" : "No"}</span></p>
+        <p className="bg-lavender m-4 p-4 rounded">
+          CSV file loaded:{" "}
+          <span className={csvLoaded ? "text-green-500" : "text-red-500"}>
+            {csvLoaded ? "🟢" : "🔴"}
+          </span>
+        </p>
+        <p className="bg-lavender m-4 p-4 rounded">
+          SQL file loaded:{" "}
+          <span className={sqlLoaded ? "text-green-500" : "text-red-500"}>
+            {sqlLoaded ? "🟢" : "🔴"}
+          </span>
+        </p>
       </div>
 
-      {/* File type selector */}
       <label className="block mb-2 font-medium">Select file type:</label>
-      <select title="File type selection"
+      <select
         value={fileType}
-        onChange={(e) => setFileType(e.target.value as "csv" | "db")}
+        onChange={(e) => {
+          setFileType(e.target.value as "csv" | "db");
+          setSelectedFile(null); // reset selected file if type changes
+        }}
         className="border px-3 py-2 mb-4 rounded w-full bg-lavender"
       >
         <option value="csv">CSV File</option>
         <option value="db">SQLite Database (.db)</option>
       </select>
 
-      {/* File upload */}
-      <input title="File upload input"
+      <input
         type="file"
         accept={fileType === "csv" ? ".csv" : ".db"}
-        onChange={handleUpload}
+        onChange={handleFileSelect}
         className="border px-3 py-2 mb-4 rounded w-full bg-lavender"
       />
-
-      {/* Proceed button */}
-      <button title="Submit file button"
-        onClick={proceed}
-        disabled={!csvLoaded || !sqlLoaded}
-        className={`px-4 py-2 rounded text-white ${csvLoaded && sqlLoaded ? "bg-green-600" : "bg-gray-400 cursor-not-allowed"}`}
-      >
-        Proceed to Mapper
-      </button>
+      <div id="upload_buttons" className="flex">
+        <button
+          onClick={handleUpload}
+          disabled={!selectedFile}
+          className={`flex-1 p-4 m-4 rounded text-white ${ selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed" }`}
+        >
+          Upload File
+        </button>
+        <button
+          onClick={proceed}
+          className={`flex-1 p-4 m-4 rounded text-white ${ csvLoaded && sqlLoaded ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed" }`}
+          /*disabled={!csvLoaded || !sqlLoaded}*/
+        >
+          Proceed to Mapper
+        </button>
+      </div>
     </div>
   );
 }
