@@ -128,6 +128,8 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
         print("Missing data for clustered route display.")
         return
 
+    print("Full ordered points being sent to ORS:", full_ordered_points)
+    print("Number of points:", len(full_ordered_points))
     # Get directions
     route_geojson = get_directions_route(full_ordered_points)
     line_coords = route_geojson["features"][0]["geometry"]["coordinates"]  # [[lon, lat], ...]
