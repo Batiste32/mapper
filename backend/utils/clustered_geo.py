@@ -4,7 +4,7 @@ from backend.database import SessionLocal
 from backend.database.models import Profile
 from backend.utils.geo import *
 
-def cluster_points(points, max_cluster_size=70):
+def cluster_points(points, max_cluster_size=50):
     """
     Cluster points into spatial batches.
     Returns: list of clusters, each is list of point indexes.

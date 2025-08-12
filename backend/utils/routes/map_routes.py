@@ -65,7 +65,7 @@ def optimize_profiles(req: RouteRequest = Body(...)):
 
     if len(points) > 30:
         print(f"Large batch: {len(points)} points. Clustering...")
-        clusters = cluster_points(points, max_cluster_size=60)
+        clusters = cluster_points(points, max_cluster_size=50)
         full_ordered_points, cluster_results = combine_cluster_routes(
             start_coord,
             clusters,
