@@ -8,29 +8,22 @@ type Props = {
   proceed: () => void;
 };
 
-export default function UploadFilePanel({
-  sqlLoaded,
-  csvLoaded,
-  setSqlLoaded,
-  setCsvLoaded,
-  proceed,
-}: Props) {
+export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, setCsvLoaded, proceed }: Props) {
   const [fileType, setFileType] = useState<"csv" | "db">("csv");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileLoading, setFileLoading] = useState<boolean>(false);
 
-  // Step 1: Just store the file when selected
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
   };
 
-  // Step 2: Upload when clicking the button
   const handleUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file first.");
       return;
     }
-
+    setFileLoading(true);
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -56,6 +49,8 @@ export default function UploadFilePanel({
     } catch (err) {
       console.error("Upload error:", err);
       alert("Upload failed.");
+    } finally {
+      setFileLoading(false);
     }
   };
 
@@ -100,10 +95,39 @@ export default function UploadFilePanel({
       <div id="upload_buttons" className="flex">
         <button
           onClick={handleUpload}
-          disabled={!selectedFile}
-          className={`flex-1 p-4 m-4 rounded text-white ${ selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed" }`}
+          disabled={fileLoading || !selectedFile}
+          className={`flex flex-1 p-4 m-4 rounded text-white justify-center items-center
+            ${ fileLoading 
+              ? "bg-lavender opacity-50 cursor-wait"
+              : selectedFile 
+              ? "bg-midnight hover:bg-lavender" 
+              : "bg-dark cursor-not-allowed" }`}
+          title={`${ selectedFile ? "Upload selected file" : "Please select a file before" }`}
         >
-          Upload File
+          {fileLoading ? (
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="self-center"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+          ) : (
+            "Upload File"
+          )}
         </button>
         <button
           onClick={proceed}
