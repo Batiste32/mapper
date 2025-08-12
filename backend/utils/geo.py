@@ -187,11 +187,13 @@ def get_directions_route(ordered_points):
 
     coordinates = [[lon, lat] for lat, lon in ordered_points]
 
+    print(f"Original points : {ordered_points[:10]}...{ordered_points[-10:]}")
+    print(f"Rearranged points : {coordinates[:10]}...{coordinates[-10:]}")
+
     body = {
         "coordinates": coordinates,
         "instructions": True
     }
-    print(f"Sending to ORS direction {coordinates}.")
     response = requests.post(url, json=body, headers=headers)
     response.raise_for_status()
     return response.json()
