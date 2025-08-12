@@ -22,10 +22,16 @@ export default function FilterPanel(
             <label className="flex-1 block mb-2">
             Min Vote Score:
             <input
-                type="number"
-                className="flex-1 w-full border rounded p-1"
-                value={filters.min_score_vote}
-                onChange={(e) => setFilters({ ...filters, min_score_vote: parseFloat(e.target.value) })}
+              type="number"
+              className="flex-1 w-full border rounded p-1"
+              value={filters.min_score_vote}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFilters({
+                  ...filters,
+                  min_score_vote: val === "" ? "" : parseFloat(val)
+                });
+              }}
             />
             </label>
             <label className="flex-1 block mb-2">
@@ -41,7 +47,7 @@ export default function FilterPanel(
             <button
               onClick={handleSearch}
               className={`flex items-center justify-center mt-4 w-full p-2 rounded text-white ${
-                mapperWait ? "bg-gray-500 cursor-not-allowed" : "bg-purple hover:bg-lavender"
+                mapperWait ? "bg-lavender opacity-50 cursor-wait" : "bg-purple hover:bg-lavender"
               }`}
               disabled={mapperWait}
             >

@@ -173,16 +173,24 @@ export default function Mapper({ goBack }: Props) {
         console.error("Geocoding error:", error);
       }
     }
-    console.log("Sending filters :", {
+
+    // Sanitize min_score_vote
+    const safeFilters = {
       ...filters,
+      ...(filters.min_score_vote === "" && { min_score_vote: undefined })
+    };
+
+    console.log("Sending filters :", {
+      ...safeFilters,
       start_lat: lat,
       start_lon: lon,
     });
+
     const res = await fetch(`${API_BASE}/profiles/optimize`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
       body: JSON.stringify({
-        ...filters,
+        ...safeFilters,
         start_lat: lat ?? 0,
         start_lon: lon ?? 0,
       }),
