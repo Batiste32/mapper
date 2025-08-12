@@ -191,7 +191,7 @@ def get_directions_route(ordered_points):
         "coordinates": coordinates,
         "instructions": True
     }
-
+    print(f"Sending to ORS direction {coordinates}.")
     response = requests.post(url, json=body, headers=headers)
     response.raise_for_status()
     return response.json()
