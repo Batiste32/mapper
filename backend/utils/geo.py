@@ -184,18 +184,21 @@ def get_directions_route(ordered_points):
         "Authorization": ORS_API_KEY,
         "Content-Type": "application/json"
     }
+
     coordinates=[]
+
     for lat, lon in ordered_points:
         if (lon > -70) or (lat < 40):
                     print(f"WARN coordinates seem outside of expected value :\nlon: {lon}, lat: {lat}")
         coordinates.append([lon, lat]) 
-    print(f"Original points : {ordered_points[:10]}...{ordered_points[-10:]}")
-    print(f"Rearranged points : {coordinates[:10]}...{coordinates[-10:]}")
+
+    print(f"Original points : {ordered_points[:10]}...{ordered_points[-10:]}\nRearranged points : {coordinates[:10]}...{coordinates[-10:]}")
 
     body = {
         "coordinates": coordinates,
-        "instructions": True
+        "instructions": False
     }
+
     response = requests.post(url, json=body, headers=headers)
     response.raise_for_status()
     return response.json()
