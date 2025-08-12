@@ -18,7 +18,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 def geocode_address(address):
-    # Ex: OpenStreetMap Nominatim API
+    
     url = f"https://nominatim.openstreetmap.org/search"
     params = {"q": address, "format": "json"}
     response = requests.get(url, params=params)
