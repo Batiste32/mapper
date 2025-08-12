@@ -185,45 +185,45 @@ export default function Mapper({ goBack }: Props) {
       start_lat: lat,
       start_lon: lon,
     });
+    try {
+      const res = await fetch(`${API_BASE}/profiles/optimize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+        body: JSON.stringify({
+          ...safeFilters,
+          start_lat: lat ?? 0,
+          start_lon: lon ?? 0,
+        }),
+      });
 
-    const res = await fetch(`${API_BASE}/profiles/optimize`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-      body: JSON.stringify({
-        ...safeFilters,
-        start_lat: lat ?? 0,
-        start_lon: lon ?? 0,
-      }),
-    });
+      const data = await res.json();
+      console.log(data);
 
-    const data = await res.json();
-    console.log(data);
+      setStart([data.start.lat, data.start.lon]);
 
-    setStart([data.start.lat, data.start.lon]);
+      const routeLatLng = data.route.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
+      setRoute(routeLatLng);
 
-    const routeLatLng = data.route.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
-    setRoute(routeLatLng);
+      const markerList = data.markers.map((m: MarkerData, idx: number) => ({
+        position: [m.lat, m.lon],
+        color: m.color,
+        properties: { index: idx + 1, array_id: m.id,
+          name: m.name, personality: m.personality,
+          arguments: m.arguments, nbhood: m.nbhood,
+          preferred_language: m.preferred_language, origin: m.origin,
+          political_scale: m.political_scale, ideal_process: m.ideal_process,
+          strategic_profile: m.strategic_profile,
+        },
+      }));
 
-    const markerList = data.markers.map((m: MarkerData, idx: number) => ({
-      position: [m.lat, m.lon],
-      color: m.color,
-      properties: {
-        index: idx + 1,
-        array_id: m.id,
-        name: m.name,
-        personality: m.personality,
-        arguments: m.arguments,
-        nbhood: m.nbhood,
-        preferred_language: m.preferred_language,
-        origin: m.origin,
-        political_scale: m.political_scale,
-        ideal_process: m.ideal_process,
-        strategic_profile: m.strategic_profile,
-      },
-    }));
-
-    setMarkers(markerList);
-    setMapperWait(false);
+      setMarkers(markerList);
+    }
+    catch (err) {
+      console.error(`Failed to search :`, err);
+    }
+    finally {
+      setMapperWait(false);
+    }
   };
   
   const ToggleProfileDisplay = (properties: Marker["properties"]) => {
