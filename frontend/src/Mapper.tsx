@@ -71,7 +71,8 @@ export default function Mapper({ goBack }: Props) {
   const [route, setRoute] = useState<LatLng[] | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [selectedProfile, setSelectedProfile] = useState<Marker["properties"] | null>(null);
-  const [startAddress, setStartAddress] = useState("");
+  const [startAddress, setStartAddress] = useState<string>("");
+  const [mapperWait, setMapperWait] = useState<boolean>(false);
 
   /* Valid database input fields */
   const [validEthnicities, setValidEthnicities] = useState([]);
@@ -144,6 +145,8 @@ export default function Mapper({ goBack }: Props) {
   }, []);
 
   const handleSearch = async () => {
+    setMapperWait(true);
+
     let lat: number = start[0];
     let lon: number = start[1];
 
@@ -212,6 +215,7 @@ export default function Mapper({ goBack }: Props) {
     }));
 
     setMarkers(markerList);
+    setMapperWait(false);
   };
   
   const ToggleProfileDisplay = (properties: Marker["properties"]) => {
@@ -233,7 +237,7 @@ export default function Mapper({ goBack }: Props) {
       <div className="flex-1 flex flex-col sm:flex-row bg-midnight" id="panels-layout">
         <FilterPanel filters={filters} setFilters={setFilters}
           startAddress={startAddress} setStartAddress={setStartAddress} handleSearch={handleSearch} 
-          validEthnicities={validEthnicities} validAlignments={validAlignments}/>
+          validEthnicities={validEthnicities} validAlignments={validAlignments} mapperWait={mapperWait}/>
 
         <MapPanel start={start} route={route} markers={markers} selectedProfile={selectedProfile} ToggleProfileDisplay={ToggleProfileDisplay} />
 
