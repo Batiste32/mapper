@@ -20,6 +20,7 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
   };
 
   const handleUpload = async () => {
+    console.log(`Uploading file for user : ${userId}`);
     if (!selectedFile) {
       alert("Please select a file first.");
       return;
