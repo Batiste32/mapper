@@ -19,6 +19,7 @@ export default function App() {
           setSqlLoaded={setSqlLoaded}
           setCsvLoaded={setCsvLoaded}
           proceed={() => setView("mapper")}
+          userId="test"
         />
       )}
       {view === "mapper" && (
