@@ -2,7 +2,7 @@ import os
 import io
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload, MediaFileUpload
 
 # Load service account credentials
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -37,8 +37,10 @@ def upload_user_db(user_id: str, file_path: str):
             "name": f"{user_id}.db",
             "parents": [FOLDER_ID]
         }
-        service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-        print(f"Uploaded DB for {user_id}")
+        media = MediaFileUpload('example.txt', mimetype='text/plain')
+
+        file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        print(f"Uploaded DB for {user_id} with ID: {file.get('id')}")
 
 def download_user_db(user_id: str, dest_path: str):
     """Download the DB file for this user_id to dest_path."""
