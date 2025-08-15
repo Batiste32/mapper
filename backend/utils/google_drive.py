@@ -7,7 +7,7 @@ from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 # Load service account credentials
 SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDENTIALS_FILE", "credentials.json")
-FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")  # Store in Render env vars
+FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 
 def get_drive_service():
     creds = service_account.Credentials.from_service_account_file(

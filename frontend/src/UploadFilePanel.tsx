@@ -6,9 +6,10 @@ type Props = {
   setSqlLoaded: (v: boolean) => void;
   setCsvLoaded: (v: boolean) => void;
   proceed: () => void;
+  userId: string;
 };
 
-export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, setCsvLoaded, proceed }: Props) {
+export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, setCsvLoaded, proceed, userId }: Props) {
   const [fileType, setFileType] = useState<"csv" | "db">("csv");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileLoading, setFileLoading] = useState<boolean>(false);
@@ -27,10 +28,12 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    const endpoint =
-      fileType === "csv"
-        ? `${import.meta.env.VITE_API_BASE}/upload_csv`
-        : `${import.meta.env.VITE_API_BASE}/upload_db`;
+    let endpoint = "";
+    if (fileType === "csv") {
+      endpoint = `${import.meta.env.VITE_API_BASE}/upload_csv`;
+    } else {
+      endpoint = `${import.meta.env.VITE_API_BASE}/upload_db?user_id=${encodeURIComponent(userId)}`;
+    }
 
     try {
       const res = await fetch(endpoint, {
@@ -78,7 +81,7 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
         value={fileType}
         onChange={(e) => {
           setFileType(e.target.value as "csv" | "db");
-          setSelectedFile(null); // reset selected file if type changes
+          setSelectedFile(null);
         }}
         className="border px-3 py-2 mb-4 rounded w-full bg-lavender"
       >
@@ -112,7 +115,7 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
               viewBox="0 0 24 24"
             >
               <circle
-                className="self-center"
+                className="opacity-25"
                 cx="12"
                 cy="12"
                 r="10"
