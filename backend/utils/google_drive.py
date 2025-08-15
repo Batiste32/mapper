@@ -9,7 +9,7 @@ from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 # Google Drive API settings
 SCOPES = ['https://www.googleapis.com/auth/drive']
 TOKEN_PICKLE = 'token.pickle'  # stores user credentials after first login
-CREDENTIALS_FILE = os.getenv("GOOGLE_OAUTH_CREDENTIALS_FILE", "credentials.json")
+CREDENTIALS_FILE = os.getenv("GOOGLE_OAUTH_CREDENTIALS_FILE", "google_oauth_credentials.json")
 FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 
 if not FOLDER_ID:
@@ -32,7 +32,7 @@ def get_drive_service():
             if not os.path.exists(CREDENTIALS_FILE):
                 raise FileNotFoundError(f"OAuth credentials file not found: {CREDENTIALS_FILE}")
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_console
         # Save the credentials for next run
         with open(TOKEN_PICKLE, 'wb') as token:
             pickle.dump(creds, token)
