@@ -2,8 +2,6 @@ from sklearn.cluster import KMeans
 from geopy.distance import geodesic
 from math import ceil
 
-from backend.database import SessionLocal
-from backend.database.models import Profile
 from backend.utils.geo import *
 
 def cluster_points(points, max_cluster_size=50):
@@ -107,90 +105,52 @@ def combine_cluster_routes(start_coord, clusters, points, profile_ids):
 
 def display_clustered_route(full_ordered_points, cluster_results, start_coord=None):
     """
-    Returns a structured JSON for the final stitched map with all clusters.
-    
-    Parameters:
-    - full_ordered_points: [(lat, lon), ...] the complete ordered route including start
-    - cluster_results: list of (cluster_center, [profile_id, ...])
-    - start_coord: optional (lat, lon) tuple
-    
-    Returns:
-    {
-        "start": { "lat": ..., "lon": ... },
-        "markers": [ { "id": ..., "name": ..., "lat": ..., "lon": ..., "color": ... }, ... ],
-        "route": {
-            "type": "LineString",
-            "coordinates": [[lon, lat], ...]
-        }
-    }
+    Loops through each cluster, retrieves a directions GeoJSON for that cluster,
+    and combines them into a single merged GeoJSON FeatureCollection.
+
+    Parameters
+    ----------
+    full_ordered_points : list of (lat, lon)
+        The points in the final visiting order (including all clusters in sequence)
+    cluster_results : list
+        A list where each element represents a cluster's ordered points
+    start_coord : tuple (lat, lon), optional
+        Starting coordinate
+
+    Returns
+    -------
+    dict
+        A combined GeoJSON FeatureCollection with all cluster routes merged
     """
-    if not full_ordered_points or not cluster_results:
-        print("Missing data for clustered route display.")
-        return
 
-    print(f"Sendind {len(full_ordered_points)} to ORS:", full_ordered_points)
-
-    # Get directions
-    route_geojson = get_directions_route(full_ordered_points)
-    line_coords = route_geojson["features"][0]["geometry"]["coordinates"]  # [[lon, lat], ...]
-
-    # Optional color gradient
-    colors = get_gradient_colors(len(full_ordered_points))
-
-    # Load all involved profile names
-    profile_ids = [pid for _, cluster in cluster_results for pid in cluster]
-    db = SessionLocal()
-    profile_map = {p.id: p.name for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_arguments = {p.id : p.suggested_arguments for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_age = {p.id : p.age for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_nbhood = {p.id : p.nbhood for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_preferred_language = {p.id : p.preferred_language for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_origin = {p.id : p.origin for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_political_scale = {p.id : p.political_scale for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_ideal_process = {p.id : p.ideal_process for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_strategic_profile = {p.id : p.strategic_profile for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    profile_personality = {p.id : p.personality for p in db.query(Profile).filter(Profile.id.in_(profile_ids)).all()}
-    db.close()
-
-    # Build marker list
-    markers = []
-    point_idx = 1  # Start at 1 since index 0 is the start_coord
-
-    for (_, ordered_ids) in cluster_results:
-        for profile_id in ordered_ids:
-            if point_idx >= len(full_ordered_points):
-                print(f"Warning: Index {point_idx} out of range for coordinates.")
-                continue
-            lat, lon = full_ordered_points[point_idx]
-            markers.append({
-                "id": profile_id,
-                "name": profile_map.get(profile_id, "Unknown"),
-                "arguments": profile_arguments.get(profile_id, "None"),
-                "age": profile_age.get(profile_id, "None"),
-                "nbhood": profile_nbhood.get(profile_id, "None"),
-                "preferred_language": profile_preferred_language.get(profile_id, "None"),
-                "origin": profile_origin.get(profile_id, "None"),
-                "political_scale": profile_political_scale.get(profile_id, "None"),
-                "ideal_process": profile_ideal_process.get(profile_id, "None"),
-                "strategic_profile": profile_strategic_profile.get(profile_id, "None"),
-                "personality": profile_personality.get(profile_id, "None"),
-                "lat": lat,
-                "lon": lon,
-                "color": colors[point_idx]  # Optional gradient color
-            })
-            point_idx += 1
-
-    if not start_coord:
-        start_coord = full_ordered_points[0]
-
-    return {
-        "start": {
-            "lat": start_coord[0],
-            "lon": start_coord[1]
-        },
-        "markers": markers,
-        "route": {
-            "type": "LineString",
-            "coordinates": line_coords  # [[lon, lat], ...]
-        }
+    combined_geojson = {
+        "type": "FeatureCollection",
+        "features": []
     }
+
+    # Track the global order of clusters
+    for cluster_idx, cluster_points in enumerate(cluster_results):
+        # Prepend start coordinate for the first cluster only
+        if cluster_idx == 0 and start_coord:
+            points_to_route = [start_coord] + cluster_points
+        else:
+            points_to_route = cluster_points
+
+        # ORS requires lon, lat order, so get_directions_route will handle that
+        if len(points_to_route) < 2:
+            print(f"Skipping cluster {cluster_idx} - not enough points.")
+            continue
+
+        # Get the route for this cluster
+        try:
+            cluster_geojson = get_directions_route(points_to_route)
+
+            # Append features to combined FeatureCollection
+            if cluster_geojson.get("features"):
+                combined_geojson["features"].extend(cluster_geojson["features"])
+
+        except Exception as e:
+            print(f"Error getting directions for cluster {cluster_idx}: {e}")
+            continue
+
+    return combined_geojson
