@@ -32,7 +32,7 @@ def get_drive_service():
             if not os.path.exists(CREDENTIALS_FILE):
                 raise FileNotFoundError(f"OAuth credentials file not found: {CREDENTIALS_FILE}")
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-            creds = flow.run_console
+            creds = flow.run_console()
         # Save the credentials for next run
         with open(TOKEN_PICKLE, 'wb') as token:
             pickle.dump(creds, token)
