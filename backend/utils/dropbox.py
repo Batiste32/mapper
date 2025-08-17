@@ -16,6 +16,7 @@ def get_dropbox_access_token():
         auth=(DROPBOX_APP_KEY, DROPBOX_APP_SECRET),
     )
     resp.raise_for_status()
+    print("Retrieved Dropbox access token")
     return resp.json()["access_token"]
 
 def upload_to_dropbox(local_path: str, dropbox_path: str):
@@ -37,6 +38,7 @@ def upload_to_dropbox(local_path: str, dropbox_path: str):
         data=data,
     )
     resp.raise_for_status()
+    print(f"Uploaded {local_path} to {dropbox_path}")
     return resp.json()
 
 def download_from_dropbox(dropbox_path: str, local_path: str):
@@ -54,6 +56,7 @@ def download_from_dropbox(dropbox_path: str, local_path: str):
     with open(local_path, "wb") as f:
         f.write(resp.content)
 
+    print(f"Downloaded file {dropbox_path} at {local_path}")
     return local_path
 
 def load_user_sessions():
@@ -63,6 +66,7 @@ def load_user_sessions():
         with open(local_path, "r") as f:
             return json.load(f)
     except:
+        print("Failed to retrieve user_session file")
         return {}  # empty if file doesn't exist yet
 
 def save_user_sessions(sessions: dict):
@@ -72,6 +76,7 @@ def save_user_sessions(sessions: dict):
     upload_to_dropbox(local_path, USER_SESSION_PATH)
 
 def hash_password(password: str) -> str:
+    print(f"Password : {password}\tHashed : {hashlib.sha256(password.encode()).hexdigest()}")
     return hashlib.sha256(password.encode()).hexdigest()
 
 def user_login(username: str, password: str):
