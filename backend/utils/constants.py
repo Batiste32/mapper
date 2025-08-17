@@ -6,6 +6,7 @@ CACHE_PATH = "backend/cache"
 NGROK_CONFIG_PATH = "backend/ngrok_config.yml"
 VITE_CONFIG_PATH = "frontend/vite.config.ts"
 CONSTANTS_PATH = "backend/utils/constants.py"
+USER_SESSION_PATH = "/user_session.json" # In Dropbox
 
 # URLs
 BASE_URL = "https://e053cf88935f.ngrok-free.app"
