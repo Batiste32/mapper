@@ -52,6 +52,8 @@ def download_from_dropbox(dropbox_path: str, local_path: str):
             "Dropbox-API-Arg": json.dumps({"path": dropbox_path}),
         },
     )
+    if resp.status_code != 200:
+        print(f"Dropbox error: {resp.status_code} {resp.text}")
     resp.raise_for_status()
 
     with open(local_path, "wb") as f:
@@ -68,7 +70,7 @@ def load_user_sessions():
             return json.load(f)
     except Exception as e:
         print(f"Failed to retrieve {USER_SESSION_PATH} -> {local_path} file: {e}")
-        return {}  # empty if file doesn't exist yet
+        return {} 
 
 def save_user_sessions(sessions: dict):
     local_path = "/tmp/user_session.json"
