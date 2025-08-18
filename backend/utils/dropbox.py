@@ -115,7 +115,7 @@ def user_upload_db(username: str, password: str, local_db_path: str):
     hashed = hash_password(password)
 
     if username not in sessions:
-        raise ValueError("User not found – register first")
+        raise ValueError(f"{username} not found in {sessions}")
 
     if sessions[username]["hashed_password"] != hashed:
         raise ValueError("Invalid password")
