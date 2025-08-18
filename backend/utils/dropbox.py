@@ -67,7 +67,7 @@ def load_user_sessions():
         with open(local_path, "r") as f:
             return json.load(f)
     except Exception as e:
-        print(f"Failed to retrieve user_session file: {e}")
+        print(f"Failed to retrieve {USER_SESSION_PATH} -> {local_path} file: {e}")
         return {}  # empty if file doesn't exist yet
 
 def save_user_sessions(sessions: dict):
