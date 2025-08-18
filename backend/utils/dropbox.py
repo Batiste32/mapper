@@ -1,5 +1,6 @@
 import os, json, requests, hashlib
 from backend.utils.constants import USER_SESSION_PATH
+from backend.database import set_database_path
 
 DROPBOX_APP_KEY = os.getenv("DROPBOX_APP_KEY")
 DROPBOX_APP_SECRET = os.getenv("DROPBOX_APP_SECRET")
@@ -65,8 +66,8 @@ def load_user_sessions():
         download_from_dropbox(USER_SESSION_PATH, local_path)
         with open(local_path, "r") as f:
             return json.load(f)
-    except:
-        print("Failed to retrieve user_session file")
+    except Exception as e:
+        print(f"Failed to retrieve user_session file: {e}")
         return {}  # empty if file doesn't exist yet
 
 def save_user_sessions(sessions: dict):
@@ -76,8 +77,20 @@ def save_user_sessions(sessions: dict):
     upload_to_dropbox(local_path, USER_SESSION_PATH)
 
 def hash_password(password: str) -> str:
-    print(f"Password : {password}\tHashed : {hashlib.sha256(password.encode()).hexdigest()}")
-    return hashlib.sha256(password.encode()).hexdigest()
+    hashed = hashlib.sha256(password.encode()).hexdigest()
+    print(f"Password : {password}\tHashed : {hashed}")
+    return hashed
+
+def register_user(username: str, password: str):
+    """Registers a new user with empty DB reference."""
+    sessions = load_user_sessions()
+    if username in sessions:
+        raise ValueError("User already exists")
+
+    hashed = hash_password(password)
+    sessions[username] = {"hashed_password": hashed, "last_db": None}
+    save_user_sessions(sessions)
+    print(f"Registered new user: {username}")
 
 def user_login(username: str, password: str):
     sessions = load_user_sessions()
@@ -93,6 +106,7 @@ def user_login(username: str, password: str):
     if last_db:
         local_db = f"/tmp/{username}.db"
         download_from_dropbox(last_db, local_db)
+        set_database_path(local_db)
         return local_db
     return None
 
@@ -101,9 +115,9 @@ def user_upload_db(username: str, password: str, local_db_path: str):
     hashed = hash_password(password)
 
     if username not in sessions:
-        # Register new user
-        sessions[username] = {"hashed_password": hashed, "last_db": None}
-    elif sessions[username]["hashed_password"] != hashed:
+        raise ValueError("User not found – register first")
+
+    if sessions[username]["hashed_password"] != hashed:
         raise ValueError("Invalid password")
 
     dropbox_path = f"/databases/{username}.db"
@@ -111,3 +125,4 @@ def user_upload_db(username: str, password: str, local_db_path: str):
 
     sessions[username]["last_db"] = dropbox_path
     save_user_sessions(sessions)
+    print(f"Updated DB for {username} at {dropbox_path}")

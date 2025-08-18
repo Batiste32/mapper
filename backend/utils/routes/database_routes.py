@@ -1,7 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from backend.utils.dropbox import user_login, user_upload_db
 from backend.utils.constants import CSV_PATH
-import os
 
 router = APIRouter()
 
