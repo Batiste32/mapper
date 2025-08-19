@@ -7,26 +7,37 @@ interface LoginPanelProps {
 }
 
 export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelProps) {
+  const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     try {
-      const route = isRegister ? "/register" : "/login";
-      console.log("username : ",user," password : ",password)
+      console.log("username : ",user," password : ",password," repeat : ",confirmPassword);
+
+      const route = "/" + mode;
+      if ((mode === "register") && (password !== confirmPassword)) {
+        alert("Passwords different, please verify them.");
+        return;
+      }
       const res = await fetch(`${import.meta.env.VITE_API_BASE}${route}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username:user, password }),
+        body: JSON.stringify({ username:user, password, email }),
       });
 
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.detail || "Error");
       }
-
+      if (mode === "reset") {
+        alert("Password successfully changed. Please log in.");
+        return;
+      }
       const data = await res.json();
       setUsername(user);
       setHasDatabase(data.has_db); // backend returns whether DB exists
@@ -36,31 +47,93 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-midnight text-white">
-      <h1 className="text-2xl mb-4">{isRegister ? "Register" : "Login"}</h1>
-      <div className="flex flex-col h-1/2 w-1/2 m-4 p-4 items-center justify-center bg-purple">
-        <input
+    <div className="flex flex-col items-center justify-center h-screen bg-midnight">
+      <h2 className="text-xl font-bold text-center text-white">
+        {mode === "login" ? "Login" : mode === "register" ? "Register" : "Forgot Password"}
+      </h2>
+      <div className="flex flex-col flex-1 items-center h-1/2 w-1/2 bg-purple m-4 p-4">
+        {/* Username */}
+        {mode !== "reset" && (
+            <input
             type="text"
-            placeholder="Username"
             value={user}
-            onChange={(e) => setUser(e.target.value)}
-            className="relative w-full m-4 p-4 rounded text-white bg-midnight hover:bg-lavender"
-        />
-        <PasswordInput value={password} onChange={setPassword} placeholder="Password"/>
-        {error && <p className="text-red-400 mb-2">{error}</p>}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            className="bg-midnight hover:bg-lavender w-full m-4 p-4 rounded"
+            />
+        )}
+
+        {/* Email */}
+        {(mode === "register" || mode === "reset") && (
+            <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="bg-midnight hover:bg-lavender w-full m-4 p-4 rounded"
+            />
+        )}
+
+        {/* Password */}
+        {mode !== "reset" && (
+            <PasswordInput
+            value={password}
+            onChange={setPassword}
+            placeholder="Password"
+            />
+        )}
+
+        {/* Confirm Password (register only) */}
+        {mode === "register" && (
+            <PasswordInput
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            placeholder="Confirm Password"
+            />
+        )}
+
         <button
             onClick={handleSubmit}
-            className="bg-midnight hover:bg-lavender p-2 rounded mb-2 w-32"
+            className="bg-midnight text-white m-4 p-4 rounded hover:bg-lavender"
         >
-            {isRegister ? "Register" : "Login"}
+            {mode === "login" ? "Login" : mode === "register" ? "Register" : "Reset Password"}
         </button>
       </div>
-    <button
-        onClick={() => setIsRegister(!isRegister)}
-        className="underline text-sm"
-    >
-        {isRegister ? "Already have an account? Login" : "New user? Register"}
-    </button>
+      {/* Switch between modes */}
+      <div className="text-sm text-gray-300 text-center">
+        {mode === "login" && (
+          <>
+            <button
+              onClick={() => setMode("register")}
+              className="text-lavender hover:underline mr-2"
+            >
+              Create an account
+            </button>
+            <button
+              onClick={() => setMode("reset")}
+              className="text-lavender hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </>
+        )}
+        {mode === "register" && (
+          <button
+            onClick={() => setMode("login")}
+            className="text-lavender hover:underline"
+          >
+            Back to Login
+          </button>
+        )}
+        {mode === "reset" && (
+          <button
+            onClick={() => setMode("login")}
+            className="text-lavender hover:underline"
+          >
+            Back to Login
+          </button>
+        )}
+      </div>
     </div>
   );
 }

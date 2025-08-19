@@ -1,4 +1,6 @@
 import os, json, requests, hashlib
+import secrets
+import string
 from backend.utils.constants import USER_SESSION_PATH
 from backend.database import set_database_path
 
@@ -83,14 +85,14 @@ def hash_password(password: str) -> str:
     print(f"Password : {password}\tHashed : {hashed}")
     return hashed
 
-def register_user(username: str, password: str):
+def register_user(username: str, password: str, mail:str):
     """Registers a new user with empty DB reference."""
     sessions = load_user_sessions()
     if username in sessions:
         raise ValueError("User already exists")
 
     hashed = hash_password(password)
-    sessions[username] = {"hashed_password": hashed, "last_db": None}
+    sessions[username] = {"mail":mail, "hashed_password": hashed, "last_db": None}
     save_user_sessions(sessions)
     print(f"Registered new user: {username}")
 
@@ -111,6 +113,39 @@ def user_login(username: str, password: str):
         set_database_path(local_db)
         return local_db
     return None
+
+def reset_password(username: str | None = None, email: str | None = None) -> str:
+    """
+    Reset a user's password by username or email.
+    Generates a temporary password, updates the session, and returns it.
+    """
+    sessions = load_user_sessions()
+
+    # Find the user
+    target_user = None
+    if username and username in sessions:
+        target_user = username
+    elif email:
+        for user, data in sessions.items():
+            if data.get("mail") == email:
+                target_user = user
+                break
+
+    if not target_user:
+        raise ValueError("User not found")
+
+    # Generate a temporary password
+    alphabet = string.ascii_letters + string.digits
+    temp_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+
+    # Hash and update
+    hashed = hash_password(temp_password)
+    sessions[target_user]["hashed_password"] = hashed
+    save_user_sessions(sessions)
+
+    print(f"Password reset for {target_user}. Temporary password: {temp_password}")
+
+    return temp_password
 
 def user_upload_db(username: str, password: str, local_db_path: str):
     sessions = load_user_sessions()

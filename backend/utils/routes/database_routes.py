@@ -1,11 +1,12 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
-from backend.utils.dropbox import user_login, user_upload_db, register_user
+from backend.utils.dropbox import user_login, user_upload_db, register_user, reset_password
 from backend.utils.constants import CSV_PATH
 
-class UserLogin(BaseModel) :
+class UserLogin(BaseModel):
     username: str
     password: str
+    email: str
 
 router = APIRouter()
 
@@ -30,11 +31,27 @@ def login(user: UserLogin):
         raise HTTPException(status_code=401, detail=str(e))
 
 @router.post("/register")
-def register(user: UserLogin): 
+def register(user: UserLogin):
+    """
+    Register a new user with username, email, and password.
+    """
     try:
-        print(f"Registering {user.username}, {user.password}")
-        register_user(user.username, user.password)
+        register_user(user.username, user.password, user.email)
         return {"message": "success", "has_db": False}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/reset_password")
+def reset_password_api(user: UserLogin):
+    """
+    Reset password for a given user (by username or email).
+    Returns a temporary password.
+    """
+    if not user.username and not user.email:
+        raise HTTPException(status_code=400, detail="Must provide username or email")
+    try:
+        temp_password = reset_password(user.username, user.email)
+        return {"message": "Temporary password generated", "temp_password": temp_password}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
