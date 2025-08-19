@@ -4,11 +4,12 @@ from sqlalchemy.orm import Session
 import os
 from dotenv import load_dotenv
 
-from backend.database import SessionLocal
+import backend.database as db_module
 from backend.database.models import User, Device
 
 def get_db():
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     try:
         yield db
     finally:

@@ -11,6 +11,7 @@ router = APIRouter(prefix="/profiles", tags=["profiles"])
 
 def get_db():
     db = db_module.SessionLocal() # Persistent link
+    print(str(db_module.SessionLocal.kw['bind'].url))
     try:
         yield db
     finally:

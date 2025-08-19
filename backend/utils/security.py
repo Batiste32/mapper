@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 from backend.database.models import User
-from backend.database import SessionLocal
+import backend.database as db_module
 from backend.utils.constants import *
 
 def verify_password(plain_password, hashed_password):
@@ -38,7 +38,7 @@ def create_admin():
     password = input("Admin password: ").strip()
     password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    db = SessionLocal()
+    db = db_module.SessionLocal()
 
     existing = db.query(User).filter(User.username == username).first()
     if existing:
@@ -54,7 +54,7 @@ def remove_admin():
     username = input("Admin username: ").strip()
     password = input("Admin password: ").strip()
 
-    db = SessionLocal()
+    db = db_module.SessionLocal()
 
     existing = db.query(User).filter(User.username == username, User.is_admin == True).first()
 
@@ -71,7 +71,7 @@ def remove_admin():
     db.close()
 
 def list_admins():
-    db = SessionLocal()
+    db = db_module.SessionLocal()
 
     admins = db.query(User).filter(User.is_admin == True).all()
 
