@@ -37,27 +37,29 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-midnight text-white">
       <h1 className="text-2xl mb-4">{isRegister ? "Register" : "Login"}</h1>
-      <input
-        type="text"
-        placeholder="Username"
-        value={user}
-        onChange={(e) => setUser(e.target.value)}
-        className="p-2 mb-2 rounded text-white bg-purple hover:bg-lavender"
-      />
-      <PasswordInput value={password} onChange={setPassword} placeholder="Password"/>
-      {error && <p className="text-red-400 mb-2">{error}</p>}
-      <button
-        onClick={handleSubmit}
-        className="bg-purple hover:bg-lavender p-2 rounded mb-2 w-32"
-      >
-        {isRegister ? "Register" : "Login"}
-      </button>
-      <button
+      <div className="flex flex-col h-1/2 w-1/2 m-4 p-4 items-center justify-center bg-purple">
+        <input
+            type="text"
+            placeholder="Username"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+            className="relative w-full m-4 p-4 rounded text-white bg-midnight hover:bg-lavender"
+        />
+        <PasswordInput value={password} onChange={setPassword} placeholder="Password"/>
+        {error && <p className="text-red-400 mb-2">{error}</p>}
+        <button
+            onClick={handleSubmit}
+            className="bg-midnight hover:bg-lavender p-2 rounded mb-2 w-32"
+        >
+            {isRegister ? "Register" : "Login"}
+        </button>
+      </div>
+    <button
         onClick={() => setIsRegister(!isRegister)}
         className="underline text-sm"
-      >
+    >
         {isRegister ? "Already have an account? Login" : "New user? Register"}
-      </button>
+    </button>
     </div>
   );
 }

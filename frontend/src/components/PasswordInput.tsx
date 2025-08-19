@@ -11,17 +11,17 @@ export default function PasswordInput({ value, onChange, placeholder }: Password
   const [show, setShow] = useState(false);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full m-4 p-4 rounded bg-midnight hover:bg-lavender">
       <input
         type={show ? "text" : "password"}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder || "Enter password"}
-        className="w-full p-2 border rounded pr-10"
+        className="w-full rounded text_white"
       />
       <button
         type="button"
-        className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+        className="absolute inset-y-0 right-10 flex items-center text-white"
         onClick={() => setShow(!show)}
       >
         {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
