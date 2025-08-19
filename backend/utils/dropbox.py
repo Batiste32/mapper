@@ -128,3 +128,4 @@ def user_upload_db(username: str, password: str, local_db_path: str):
     sessions[username]["last_db"] = dropbox_path
     save_user_sessions(sessions)
     print(f"Updated DB for {username} at {dropbox_path}")
+    set_database_path(local_db_path)
