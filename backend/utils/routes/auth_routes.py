@@ -18,7 +18,7 @@ def get_db():
         yield db
     finally:
         db.close()
-
+"""
 @router.post("/login")
 def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == payload.username).first()
@@ -40,3 +40,4 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
         "refresh_token": refresh_token,
         "device_token": device_token
     }
+"""

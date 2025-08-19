@@ -15,6 +15,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
   const handleSubmit = async () => {
     try {
       const route = isRegister ? "/register" : "/login";
+      console.log("username : ",user," password : ",password)
       const res = await fetch(`${import.meta.env.VITE_API_BASE}${route}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
