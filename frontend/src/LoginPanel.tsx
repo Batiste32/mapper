@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PasswordInput from "./components/PasswordInput";
 
 interface LoginPanelProps {
   setUsername: (u: string) => void;
@@ -6,8 +7,8 @@ interface LoginPanelProps {
 }
 
 export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelProps) {
-  const [username, setU] = useState("");
-  const [password, setP] = useState("");
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
 
@@ -17,7 +18,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
       const res = await fetch(`${import.meta.env.VITE_API_BASE}${route}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ user, password }),
       });
 
       if (!res.ok) {
@@ -26,7 +27,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
       }
 
       const data = await res.json();
-      setUsername(username);
+      setUsername(user);
       setHasDatabase(data.has_db); // backend returns whether DB exists
     } catch (err: any) {
       setError(err.message);
@@ -34,22 +35,16 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-purple text-white">
+    <div className="flex flex-col items-center justify-center h-screen bg-midnight text-white">
       <h1 className="text-2xl mb-4">{isRegister ? "Register" : "Login"}</h1>
       <input
         type="text"
         placeholder="Username"
-        value={username}
-        onChange={(e) => setU(e.target.value)}
+        value={user}
+        onChange={(e) => setUser(e.target.value)}
         className="p-2 mb-2 rounded text-white bg-purple hover:bg-lavender"
       />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setP(e.target.value)}
-        className="p-2 mb-2 rounded text-white bg-purple hover:bg-lavender"
-      />
+      <PasswordInput value={password} onChange={setPassword} placeholder="Password"/>
       {error && <p className="text-red-400 mb-2">{error}</p>}
       <button
         onClick={handleSubmit}
