@@ -1,30 +1,19 @@
-import { useState} from "react";
-
-import Mapper from "./Mapper";
+import { useState } from "react";
+import LoginPanel from "./LoginPanel";
 import UploadFilePanel from "./UploadFilePanel";
-
-import './App.css'
+import Mapper from "./Mapper";
 
 export default function App() {
-  const [sqlLoaded, setSqlLoaded] = useState<boolean>(false);
-  const [csvLoaded, setCsvLoaded] = useState<boolean>(false);
-  const [view, setView] = useState<"upload" | "mapper">("upload");
-  return (
-    <>
-      <h1 className="text-2xl font-bold m-4 bg-purple p-4 rounded">Intelligent Mapper</h1>
-      {view === "upload" && (
-        <UploadFilePanel
-          sqlLoaded={sqlLoaded}
-          csvLoaded={csvLoaded}
-          setSqlLoaded={setSqlLoaded}
-          setCsvLoaded={setCsvLoaded}
-          proceed={() => setView("mapper")}
-          userId="batiste_augereau"
-        />
-      )}
-      {view === "mapper" && (
-        <Mapper goBack={() => setView("upload")} />
-      )}
-    </>
-  );
+  const [username, setUsername] = useState<string | null>(null);
+  const [hasDatabase, setHasDatabase] = useState(false);
+
+  if (!username) {
+    return <LoginPanel setUsername={setUsername} setHasDatabase={setHasDatabase} />;
+  }
+
+  if (!hasDatabase) {
+    return <UploadFilePanel username={username} setHasDatabase={setHasDatabase} />;
+  }
+
+  return <Mapper username={username} />;
 }
