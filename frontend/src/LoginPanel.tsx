@@ -34,21 +34,21 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-midnight text-white">
+    <div className="flex flex-col items-center justify-center h-screen bg-purple text-white">
       <h1 className="text-2xl mb-4">{isRegister ? "Register" : "Login"}</h1>
       <input
         type="text"
         placeholder="Username"
         value={username}
         onChange={(e) => setU(e.target.value)}
-        className="p-2 mb-2 rounded text-black"
+        className="p-2 mb-2 rounded text-white bg-purple hover:bg-lavender"
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setP(e.target.value)}
-        className="p-2 mb-2 rounded text-black"
+        className="p-2 mb-2 rounded text-white bg-purple hover:bg-lavender"
       />
       {error && <p className="text-red-400 mb-2">{error}</p>}
       <button

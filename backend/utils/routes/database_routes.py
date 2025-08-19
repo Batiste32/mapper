@@ -1,6 +1,11 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from pydantic import BaseModel
 from backend.utils.dropbox import user_login, user_upload_db, register_user
 from backend.utils.constants import CSV_PATH
+
+class UserLogin(BaseModel) :
+    username: str
+    password: str
 
 router = APIRouter()
 
@@ -20,12 +25,12 @@ def login(username: str = Form(...), password: str = Form(...)):
         local_db = user_login(username, password)
         if local_db:
             current_files["db"] = local_db
-        return {"status": "success", "db_path": local_db, "has_db": True}
+        return {"status": "success", "db_path": local_db, "has_db": bool(local_db)}
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
 
 @router.post("/register")
-def register_user_api(user): 
+def register_user_api(user: UserLogin): 
     try:
         register_user(user.username, user.password)
         return {"message": "Registered successfully", "has_db": False}
