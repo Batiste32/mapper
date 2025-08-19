@@ -16,13 +16,13 @@ current_files = {
 }
 
 @router.post("/login")
-def login(username: str = Form(...), password: str = Form(...)):
+def login(user: UserLogin):
     """
     Authenticate a user. If they already have a database on Dropbox,
     download it to /tmp/<username>.db and set current_files["db"].
     """
     try:
-        local_db = user_login(username, password)
+        local_db = user_login(user.username, user.password)
         if local_db:
             current_files["db"] = local_db
         return {"status": "success", "db_path": local_db, "has_db": bool(local_db)}
