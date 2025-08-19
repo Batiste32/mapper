@@ -30,10 +30,11 @@ def login(user: UserLogin):
         raise HTTPException(status_code=401, detail=str(e))
 
 @router.post("/register")
-def register_user_api(user: UserLogin): 
+def register(user: UserLogin): 
     try:
+        print(f"Registering {user.username}, {user.password}")
         register_user(user.username, user.password)
-        return {"message": "Registered successfully", "has_db": False}
+        return {"message": "success", "has_db": False}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
