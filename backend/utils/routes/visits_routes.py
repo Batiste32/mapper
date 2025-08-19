@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.database import SessionLocal
+import backend.database as db_module
 from backend.database.models import Visit, Profile
 from backend.utils.dependencies import get_current_user
 from datetime import datetime
@@ -8,7 +8,8 @@ from datetime import datetime
 router = APIRouter(prefix="/visits", tags=["visits"])
 
 def get_db():
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     try:
         yield db
     finally:

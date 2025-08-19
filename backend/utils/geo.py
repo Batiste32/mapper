@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from backend.database.models import Profile
-from backend.database import SessionLocal
+import backend.database as db_module
 
 def haversine(lat1, lon1, lat2, lon2):
     # rayon de la Terre en km
@@ -88,7 +88,8 @@ def compute_straight_dist(start_lat=None, start_lon=None):
         print("Missing start coordinates.")
         return
 
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     profiles = db.query(Profile).all()
     updated = 0
 
@@ -255,7 +256,8 @@ def display_route_on_map(result, id_map, profiles, start_coord=None):
     line_coords = route_geojson["features"][0]["geometry"]["coordinates"]  # [ [lon, lat], ... ]
 
     # Load names
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     profile_names = {}
     profile_arguments = {}
     profile_age = {}

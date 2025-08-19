@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from backend.database.models import User, Device
 from backend.utils.security import verify_password, create_access_token, create_refresh_token
-from backend.database import SessionLocal
+import backend.database as db_module
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -12,7 +12,8 @@ class LoginRequest(BaseModel):
     password: str
 
 def get_db():
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     try:
         yield db
     finally:

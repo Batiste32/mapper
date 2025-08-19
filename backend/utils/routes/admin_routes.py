@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.database import SessionLocal
+import backend.database as db_module
 from backend.database.models import ConnectionLog
 from backend.utils.dependencies import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 def get_db():
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     try:
         yield db
     finally:

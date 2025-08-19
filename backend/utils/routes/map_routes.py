@@ -5,7 +5,7 @@ from typing import Optional, List
 import httpx
 from sqlalchemy.orm import Session
 
-from backend.database import SessionLocal
+import backend.database as db_module
 from backend.database.models import Profile
 from backend.utils.geo import get_optimized_route, display_route_on_map
 from backend.utils.clustered_geo import *
@@ -29,7 +29,8 @@ def optimize_profiles(req: RouteRequest = Body(...)):
     - Return GeoJSON path
     """
 
-    db = SessionLocal()
+    db = db_module.SessionLocal()
+    print(str(db_module.SessionLocal.kw['bind'].url))
     query = db.query(Profile)
 
     if req.ethnicity:
