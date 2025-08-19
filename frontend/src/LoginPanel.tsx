@@ -19,7 +19,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
       const res = await fetch(`${import.meta.env.VITE_API_BASE}${route}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, password }),
+        body: JSON.stringify({ username:user, password }),
       });
 
       if (!res.ok) {
