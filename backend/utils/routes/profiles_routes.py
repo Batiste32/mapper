@@ -4,15 +4,13 @@ from fastapi.responses import StreamingResponse
 import csv
 import io
 
-from backend.database import SessionLocal
+import backend.database as db_module
 from backend.database.models import Profile
-from backend.utils.dependencies import get_current_user
-from backend.utils.geo import haversine, geocode_address
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
 def get_db():
-    db = SessionLocal()
+    db = db_module.SessionLocal() # Persistent link
     try:
         yield db
     finally:
@@ -37,10 +35,9 @@ def get_filtered_profiles(
     return query
 
 @router.get("/all")
-def list_all_profiles(db: Session = Depends(get_db), user = Depends(get_current_user)):
+def list_all_profiles(db: Session = Depends(get_db)):
     profiles = db.query(Profile).all()
     return profiles
-
 
 @router.get("/")
 def list_profiles(
@@ -50,8 +47,7 @@ def list_profiles(
     nbhood: str = Query("Loyola"),  
     limit: int = Query(20),
     offset: int = Query(0),
-    db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     query = get_filtered_profiles(db, score_min, score_max, origin, nbhood)
 
@@ -64,8 +60,7 @@ def export_profiles(
     score_max: int = Query(None),
     origin: str = Query(None),
     nbhood: str = Query("Loyola"),
-    db: Session = Depends(get_db),
-    user = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     query = get_filtered_profiles(db, score_min, score_max, origin, nbhood)
 

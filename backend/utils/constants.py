@@ -1,6 +1,5 @@
 # Paths
 ENV_PATH = "frontend/.env"
-DATABASE_PATH = "backend/database/electoral_app.db"
 CSV_PATH = "backend/database/profiles.csv"
 CACHE_PATH = "backend/cache"
 NGROK_CONFIG_PATH = "backend/ngrok_config.yml"
@@ -10,7 +9,6 @@ USER_SESSION_PATH = "/user_session.json" # In Dropbox
 
 # URLs
 BASE_URL = "https://e053cf88935f.ngrok-free.app"
-DATABASE_URL = "sqlite:///backend/database/electoral_app.db"
 NGROK_API_URL = "http://localhost:4040/api/tunnels"
 
 # Strings
