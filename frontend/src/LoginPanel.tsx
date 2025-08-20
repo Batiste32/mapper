@@ -3,20 +3,21 @@ import PasswordInput from "./components/PasswordInput";
 
 interface LoginPanelProps {
   setUsername: (u: string) => void;
+  setPassword: (p: string) => void;
   setHasDatabase: (b: boolean) => void;
 }
 
-export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelProps) {
+export default function LoginPanel({ setUsername, setPassword, setHasDatabase }: LoginPanelProps) {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPass] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
     try {
-      console.log("username : ",user," password : ",password," repeat : ",confirmPassword);
+      console.log("username : ",user," mail : ",email," password : ",password," repeat : ",confirmPassword);
 
       const route = "/" + mode;
       if ((mode === "register") && (password !== confirmPassword)) {
@@ -40,6 +41,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
       }
       const data = await res.json();
       setUsername(user);
+      setPassword(password);
       setHasDatabase(data.has_db); // backend returns whether DB exists
     } catch (err: any) {
       setError(err.message);

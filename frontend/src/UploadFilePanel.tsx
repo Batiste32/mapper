@@ -6,15 +6,22 @@ type Props = {
   setSqlLoaded: (v: boolean) => void;
   setCsvLoaded: (v: boolean) => void;
   proceed: () => void;
+  username: string;
+  password: string;
 };
 
-export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, setCsvLoaded, proceed }: Props) {
+export default function UploadFilePanel({
+  sqlLoaded,
+  csvLoaded,
+  setSqlLoaded,
+  setCsvLoaded,
+  proceed,
+  username,
+  password,
+}: Props) {
   const [fileType, setFileType] = useState<"csv" | "db">("csv");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileLoading, setFileLoading] = useState<boolean>(false);
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -24,10 +31,6 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
   const handleUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file first.");
-      return;
-    }
-    if (!username || !password) {
-      alert("Please enter username and password.");
       return;
     }
 
@@ -71,24 +74,6 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
   return (
     <div className="p-4 bg-purple rounded shadow-md mb-6">
       <h2 className="text-lg font-bold mb-2">Upload Files</h2>
-
-      {/* Login fields (for db uploads) */}
-      <div className="mb-4 bg-lavender p-2 rounded">
-        <label className="block mb-2">Username</label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <label className="block mt-2 mb-2">Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-      </div>
 
       {/* Status indicators */}
       <div className="mb-4">
@@ -134,7 +119,13 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
           onClick={handleUpload}
           disabled={fileLoading || !selectedFile}
           className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
-            ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed"}`}
+            ${
+              fileLoading
+                ? "bg-lavender opacity-50 cursor-wait"
+                : selectedFile
+                ? "bg-midnight hover:bg-lavender"
+                : "bg-dark cursor-not-allowed"
+            }`}
         >
           {fileLoading ? (
             <svg
@@ -143,8 +134,19 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
             </svg>
           ) : (
             "Upload File"
@@ -152,7 +154,11 @@ export default function UploadFilePanel({ sqlLoaded, csvLoaded, setSqlLoaded, se
         </button>
         <button
           onClick={proceed}
-          className={`flex-1 p-4 m-2 rounded text-white ${csvLoaded && sqlLoaded ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed"}`}
+          className={`flex-1 p-4 m-2 rounded text-white ${
+            csvLoaded && sqlLoaded
+              ? "bg-midnight hover:bg-lavender"
+              : "bg-dark cursor-not-allowed"
+          }`}
           disabled={!csvLoaded || !sqlLoaded}
         >
           Proceed to Mapper
