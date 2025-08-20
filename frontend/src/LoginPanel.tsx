@@ -67,31 +67,31 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
 
         {/* Email */}
         {(mode === "register" || mode === "reset") && (
-            <input
+          <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             className="bg-midnight hover:bg-lavender w-full m-4 p-4 rounded"
-            />
+          />
         )}
 
         {/* Password */}
         {mode !== "reset" && (
-            <PasswordInput
+          <PasswordInput
             value={password}
-            onChange={setPassword}
+            onChange={setPass}
             placeholder="Password"
-            />
+          />
         )}
 
         {/* Confirm Password (register only) */}
         {mode === "register" && (
-            <PasswordInput
+          <PasswordInput
             value={confirmPassword}
             onChange={setConfirmPassword}
             placeholder="Confirm Password"
-            />
+          />
         )}
 
         <button
