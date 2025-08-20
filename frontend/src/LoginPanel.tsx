@@ -12,7 +12,6 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
@@ -35,7 +34,8 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
         throw new Error(err.detail || "Error");
       }
       if (mode === "reset") {
-        alert("Password successfully changed. Please log in.");
+        const data = await res.json();
+        alert(`Password successfully changed. Please log in with ${data.temp_password}.`);
         return;
       }
       const data = await res.json();
@@ -57,7 +57,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
             <input
             type="text"
             value={user}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setUser(e.target.value)}
             placeholder="Username"
             className="bg-midnight hover:bg-lavender w-full m-4 p-4 rounded"
             />
