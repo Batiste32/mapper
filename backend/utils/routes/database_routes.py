@@ -41,7 +41,7 @@ def register(user: UserLogin):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/reset_password")
+@router.post("/reset")
 def reset_password_api(user: UserLogin):
     """
     Reset password for a given user (by username or email).

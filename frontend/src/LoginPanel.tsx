@@ -51,7 +51,7 @@ export default function LoginPanel({ setUsername, setHasDatabase }: LoginPanelPr
       <h2 className="text-xl font-bold text-center text-white">
         {mode === "login" ? "Login" : mode === "register" ? "Register" : "Forgot Password"}
       </h2>
-      <div className="flex flex-col flex-1 items-center h-1/2 w-1/2 bg-purple m-4 p-4">
+      <div className="flex flex-col flex-1 items-center h-1/3 w-1/2 bg-purple m-4 p-4">
         {/* Username */}
         {mode !== "reset" && (
             <input
