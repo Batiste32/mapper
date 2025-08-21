@@ -242,7 +242,7 @@ export default function Mapper({ goBack }: Props) {
 
   return (
     <div className="flex flex-col h-full bg-midnight" id="mapper-main">
-      <div className="flex-1 flex flex-col sm:flex-row bg-midnight" id="panels-layout">
+      <div className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen" id="panels-layout">
         <FilterPanel filters={filters} setFilters={setFilters}
           startAddress={startAddress} setStartAddress={setStartAddress} handleSearch={handleSearch} 
           validEthnicities={validEthnicities} validAlignments={validAlignments} mapperWait={mapperWait}/>
