@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.inspection import inspect
 from fastapi.responses import StreamingResponse
 import csv
 import io
@@ -35,6 +36,18 @@ def get_filtered_profiles(
 
     return query
 
+@router.get("/fields")
+def list_profile_fields():
+    """
+    Returns all available Profile fields and their SQLAlchemy types.
+    Useful for building dynamic filters on the frontend.
+    """
+    mapper = inspect(Profile)
+    fields = {}
+    for column in mapper.columns:
+        fields[column.name] = str(column.type)
+    return fields
+
 @router.get("/all")
 def list_all_profiles(db: Session = Depends(get_db)):
     profiles = db.query(Profile).all()
@@ -42,18 +55,36 @@ def list_all_profiles(db: Session = Depends(get_db)):
 
 @router.get("/")
 def list_profiles(
-    score_min: int = Query(None),
-    score_max: int = Query(None),
-    origin: str = Query(None),
-    nbhood: str = Query("Loyola"),  
+    db: Session = Depends(get_db),
     limit: int = Query(20),
     offset: int = Query(0),
-    db: Session = Depends(get_db)
+    **filters
 ):
-    query = get_filtered_profiles(db, score_min, score_max, origin, nbhood)
+    query = db.query(Profile)
 
-    profiles = query.offset(offset).limit(limit).all()
-    return profiles
+    # Apply filters dynamically
+    for field, value in filters.items():
+        if not hasattr(Profile, field) or value is None:
+            continue
+        column = getattr(Profile, field)
+
+        # Support numeric ranges (min/max)
+        if field.endswith("_min"):
+            base_field = field[:-4]
+            if hasattr(Profile, base_field):
+                query = query.filter(getattr(Profile, base_field) >= value)
+        elif field.endswith("_max"):
+            base_field = field[:-4]
+            if hasattr(Profile, base_field):
+                query = query.filter(getattr(Profile, base_field) <= value)
+        else:
+            # Fuzzy match for strings
+            if isinstance(value, str):
+                query = query.filter(column.ilike(f"%{value}%"))
+            else:
+                query = query.filter(column == value)
+
+    return query.offset(offset).limit(limit).all()
 
 @router.get("/export")
 def export_profiles(

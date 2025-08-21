@@ -1,81 +1,63 @@
+import { useEffect, useState } from "react";
 import AutocompleteInput from "./AutocompleteInput";
 
 interface FilterPanelProps {
-  filters: any;
-  setFilters: React.Dispatch<React.SetStateAction<any>>;
-  startAddress: string;
-  setStartAddress: (value: string) => void;
-  handleSearch: () => void;
-  validEthnicities: string[];
-  validAlignments: string[];
-  mapperWait: boolean;
+  applyFilters: (filters: Record<string, string>) => void;
 }
 
-export default function FilterPanel( 
-    { filters, setFilters, startAddress, setStartAddress, handleSearch, validEthnicities, validAlignments, mapperWait }: FilterPanelProps ){
+export default function FilterPanel({ applyFilters }: FilterPanelProps) {
+  const [fields, setFields] = useState<{ [key: string]: string }>({});
+  const [filters, setFilters] = useState<{ [key: string]: string }>({});
+  const [suggestions, setSuggestions] = useState<{ [key: string]: string[] }>({});
 
-    return(
-        <div className="flex flex-col sm:w-64 p-4 bg-midnight border-b sm:border-b-0 sm:border-r max-h-[30vh] sm:max-h-none overflow-auto z-10">
-            <h2 className="flex-1 text-xl font-semibold mb-4">Filters</h2>
-            <AutocompleteInput label="Ethnicity" value={filters.ethnicity} onChange={(val) => setFilters({ ...filters, ethnicity: val })} suggestions={validEthnicities}/>
-            <AutocompleteInput label="Political Alignment" value={filters.political_alignment} onChange={(val) => setFilters({ ...filters, political_alignment: val })} suggestions={validAlignments}/>
-            <label className="flex-1 block mb-2">
-            Min Vote Score:
-            <input
-              type="number"
-              className="flex-1 w-full border rounded p-1"
-              value={filters.min_score_vote}
-              onChange={(e) => {
-                const val = e.target.value;
-                setFilters({
-                  ...filters,
-                  min_score_vote: val === "" ? "" : parseFloat(val)
-                });
-              }}
-            />
-            </label>
-            <label className="flex-1 block mb-2">
-            Start Adress :
-            <input
-            type="text"
-            value={startAddress}
-            onChange={(e) => setStartAddress(e.target.value)}
-            placeholder="(leave blank to use GPS)"
-            className="flex-1 border p-2 rounded w-full"
-            />
-            </label>
-            <button
-              onClick={handleSearch}
-              className={`flex items-center justify-center mt-4 w-full p-2 rounded text-white ${
-                mapperWait ? "bg-lavender opacity-50 cursor-wait" : "bg-purple hover:bg-lavender"
-              }`}
-              disabled={mapperWait}
-            >
-              {mapperWait ? (
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
-                </svg>
-              ) : (
-                "Search"
-              )}
-            </button>
-        </div>
+  // Fetch available fields on mount
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE}/profiles/fields`)
+      .then((res) => res.json())
+      .then((data) => setFields(data));
+  }, []);
+
+  // Fetch valid values for categorical fields
+  const fetchSuggestions = async (field: string) => {
+    if (suggestions[field]) return;
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE}/profiles/valid_values?field=${field}`
       );
+      if (res.ok) {
+        const values = await res.json();
+        setSuggestions((prev) => ({ ...prev, [field]: values }));
+      }
+    } catch (err) {
+      console.error(`Failed to load suggestions for ${field}`, err);
     }
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="p-4 bg-purple rounded">
+      <h2 className="font-bold text-white">Filters</h2>
+
+      {Object.entries(fields).map(([field, type]) => (
+        <AutocompleteInput
+          key={field}
+          label={field}
+          value={filters[field] || ""}
+          onChange={(val) => handleChange(field, val)}
+          suggestions={suggestions[field] || []}
+          onFocus={() => fetchSuggestions(field)}
+        />
+      ))}
+
+      <button
+        onClick={() => applyFilters(filters)}
+        className="bg-midnight hover:bg-lavender p-2 mt-4 rounded text-white"
+      >
+        Apply Filters
+      </button>
+    </div>
+  );
+}

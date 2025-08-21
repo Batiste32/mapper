@@ -5,6 +5,7 @@ interface AutocompleteInputProps {
   value: string;
   onChange: (val: string) => void;
   suggestions: string[];
+  onFocus?: () => void; // 🔹 allow parent to trigger data load
 }
 
 const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
@@ -12,6 +13,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
   value,
   onChange,
   suggestions,
+  onFocus,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -22,6 +24,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
 
   const handleFocus = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (onFocus) onFocus();
     setShowSuggestions(true);
   };
 
