@@ -14,11 +14,12 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
   const [password, setPass] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [logging, setLogging] = useState(false);
 
   const handleSubmit = async () => {
     try {
       console.log("username : ",user," mail : ",email," password : ",password," repeat : ",confirmPassword);
-
+      setLogging(true);
       const route = "/" + mode;
       if ((mode === "register") && (password !== confirmPassword)) {
         alert("Passwords different, please verify them.");
@@ -45,6 +46,9 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
       setHasDatabase(data.has_db); // backend returns whether DB exists
     } catch (err: any) {
       setError(err.message);
+    }
+    finally {
+      setLogging(false);
     }
   };
 
@@ -93,8 +97,9 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
         )}
 
         <button
-            onClick={handleSubmit}
-            className="bg-midnight text-white m-4 p-4 rounded hover:bg-lavender"
+          disabled={logging}
+          onClick={handleSubmit}
+          className={`text-white m-4 p-4 rounded ${logging ? "bg-lavender opacity-50 cursor-wait" : "bg-midnight hover:bg-lavender"}`}
         >
             {mode === "login" ? "Login" : mode === "register" ? "Register" : "Reset Password"}
         </button>
