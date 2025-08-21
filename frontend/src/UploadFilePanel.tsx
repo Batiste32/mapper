@@ -4,9 +4,10 @@ type Props = {
   username: string;
   password: string;
   setHasDatabase: (b: boolean) => void;
+  switchPanel: () => void;
 };
 
-export default function UploadFilePanel({ username, password, setHasDatabase }: Props) {
+export default function UploadFilePanel({ username, password, setHasDatabase, switchPanel }: Props) {
   const [fileType, setFileType] = useState<"csv" | "db">("csv");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileLoading, setFileLoading] = useState(false);
@@ -100,6 +101,15 @@ export default function UploadFilePanel({ username, password, setHasDatabase }: 
           ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed"}`}
       >
         {fileLoading ? "Uploading..." : "Upload File"}
+      </button>
+
+      <button
+        onClick={switchPanel}
+        disabled={fileLoading}
+        className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
+          ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : "bg-midnight hover:bg-lavender"}`}
+      >
+        Proceed to Mapper
       </button>
     </div>
   );
