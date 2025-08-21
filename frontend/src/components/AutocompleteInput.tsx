@@ -28,9 +28,9 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
     setShowSuggestions(true);
   };
 
-  const filteredSuggestions = suggestions.filter((val) =>
-    val.toLowerCase().includes(value.toLowerCase())
-  );
+  const filteredSuggestions = suggestions
+    .map((val) => String(val))
+    .filter((val) => val.toLowerCase().includes(value.toLowerCase()));
 
   return (
     <div className="relative mb-4">
