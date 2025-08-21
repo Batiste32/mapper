@@ -3,6 +3,7 @@ import secrets
 import string
 from backend.utils.constants import USER_SESSION_PATH
 from backend.database import set_database_path
+from backend.utils.mail import send_email
 
 DROPBOX_APP_KEY = os.getenv("DROPBOX_APP_KEY")
 DROPBOX_APP_SECRET = os.getenv("DROPBOX_APP_SECRET")
@@ -114,25 +115,18 @@ def user_login(username: str, password: str):
         return local_db
     return None
 
-def reset_password(username: str | None = None, email: str | None = None) -> str:
+def reset_password(username: str, email: str) -> None:
     """
-    Reset a user's password by username or email.
-    Generates a temporary password, updates the session, and returns it.
+    Reset a user's password by username and email.
+    Generates a temporary password, updates the session, and returns it via email.
     """
     sessions = load_user_sessions()
 
     # Find the user
-    target_user = None
-    if username and username in sessions:
-        target_user = username
-    elif email:
-        for user, data in sessions.items():
-            if data.get("mail") == email:
-                target_user = user
-                break
-
-    if not target_user:
-        raise ValueError("User not found")
+    if username not in sessions :
+        raise ValueError(f"Cannot find user {username}.")
+    if sessions[username]["mail"] != email :
+        raise ValueError(f"Email {email} doesn't match user {username}.")
 
     # Generate a temporary password
     alphabet = string.ascii_letters + string.digits
@@ -140,12 +134,13 @@ def reset_password(username: str | None = None, email: str | None = None) -> str
 
     # Hash and update
     hashed = hash_password(temp_password)
-    sessions[target_user]["hashed_password"] = hashed
+    sessions[username]["hashed_password"] = hashed
     save_user_sessions(sessions)
 
-    print(f"Password reset for {target_user}. Temporary password: {temp_password}")
+    body = f"Dear {username},\nA password reset for your Mapper account has been requested.\nHere is your new password : {temp_password}.\nIf you didn't request such a change, please contact Batiste Augereau at batiste.augereau@grenoble-inp.org.\nThank you."
+    send_email(email, "Mapper Password Reset", body)
 
-    return temp_password
+    print(f"Password change :\n{username}")
 
 def user_upload_db(username: str, password: str, local_db_path: str):
     sessions = load_user_sessions()

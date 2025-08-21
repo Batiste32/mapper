@@ -44,14 +44,14 @@ def register(user: UserLogin):
 @router.post("/reset")
 def reset_password_api(user: UserLogin):
     """
-    Reset password for a given user (by username or email).
-    Returns a temporary password.
+    Reset password for a given user (username and email).
+    Returns a temporary password by mail.
     """
-    if not user.username and not user.email:
-        raise HTTPException(status_code=400, detail="Must provide username or email")
+    if not user.username or not user.email:
+        raise HTTPException(status_code=400, detail="Must provide username and email")
     try:
-        temp_password = reset_password(user.username, user.email)
-        return {"message": "Temporary password generated", "temp_password": temp_password}
+        reset_password(user.username, user.email)
+        return {"message": "A temporary password has been sent to your email."}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -35,8 +35,8 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
         throw new Error(err.detail || "Error");
       }
       if (mode === "reset") {
-        const data = await res.json();
-        alert(`Password successfully changed. Please log in with ${data.temp_password}.`);
+        await res.json();
+        alert("If the username and email match, a temporary password has been sent to your email.");
         return;
       }
       const data = await res.json();
