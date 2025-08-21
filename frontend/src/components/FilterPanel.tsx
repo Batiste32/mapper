@@ -41,17 +41,18 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
     <div className="p-4 bg-purple rounded">
       <h2 className="font-bold text-white">Filters</h2>
 
-      {Object.entries(fields).map(([field, type]) => (
-        <AutocompleteInput
-          key={field}
-          label={field}
-          value={filters[field] || ""}
-          onChange={(val) => handleChange(field, val)}
-          suggestions={suggestions[field] || []}
-          onFocus={() => fetchSuggestions(field)}
-        />
-      ))}
-
+      <div className="overflow-y-auto pr-2">
+        {Object.entries(fields).map(([field, type]) => (
+          <AutocompleteInput
+            key={field}
+            label={field}
+            value={filters[field] || ""}
+            onChange={(val) => handleChange(field, val)}
+            suggestions={suggestions[field] || []}
+            onFocus={() => fetchSuggestions(field)}
+          />
+        ))}
+      </div>
       <button
         onClick={() => applyFilters(filters)}
         className="bg-midnight hover:bg-lavender p-2 mt-4 rounded text-white"
