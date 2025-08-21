@@ -5,10 +5,10 @@ import Mapper from "./Mapper";
 
 export default function App() {
   const [username, setUsername] = useState<string | null>(null);
-  const [password, setPassword] = useState<string>(""); // track password
+  const [password, setPassword] = useState<string | null>(null);
   const [hasDatabase, setHasDatabase] = useState(false);
 
-  if (!username) {
+  if (!username || !password) {
     return (
       <LoginPanel
         setUsername={setUsername}
