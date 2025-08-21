@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default function UploadFilePanel({ username, password, setHasDatabase, switchPanel }: Props) {
-  const [fileType, setFileType] = useState<"csv" | "db">("csv");
+  const [fileType, setFileType] = useState<"csv" | "db">("db");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileLoading, setFileLoading] = useState(false);
 
@@ -93,24 +93,25 @@ export default function UploadFilePanel({ username, password, setHasDatabase, sw
         className="border px-3 py-2 mb-4 rounded w-full bg-lavender"
       />
 
-      {/* Upload */}
-      <button
-        onClick={handleUpload}
-        disabled={fileLoading || !selectedFile}
-        className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
-          ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed"}`}
-      >
-        {fileLoading ? "Uploading..." : "Upload File"}
-      </button>
+      <div className="flex flex-row">
+        <button
+          onClick={handleUpload}
+          disabled={fileLoading || !selectedFile}
+          className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
+            ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed"}`}
+        >
+          {fileLoading ? "Uploading..." : "Upload File"}
+        </button>
 
-      <button
-        onClick={switchPanel}
-        disabled={fileLoading}
-        className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
-          ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : "bg-midnight hover:bg-lavender"}`}
-      >
-        Proceed to Mapper
-      </button>
+        <button
+          onClick={switchPanel}
+          disabled={fileLoading}
+          className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
+            ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : "bg-midnight hover:bg-lavender"}`}
+        >
+          Proceed to Mapper
+        </button>
+      </div>
     </div>
   );
 }
