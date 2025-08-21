@@ -5,7 +5,7 @@ interface AutocompleteInputProps {
   value: string;
   onChange: (val: string) => void;
   suggestions: string[];
-  onFocus?: () => void; // 🔹 allow parent to trigger data load
+  onFocus?: () => void;
 }
 
 const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
