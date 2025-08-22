@@ -33,7 +33,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
     .filter((val) => val.toLowerCase().includes(value.toLowerCase()));
 
   return (
-    <div className="relative mb-4 flex-1">
+    <div className="relative mb-4">
       <label className="block text-sm font-medium mb-1">{label}
         <input type="text" className="w-full border px-3 py-2 rounded" value={value}
           onChange={(e) => onChange(e.target.value)}
