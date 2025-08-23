@@ -57,7 +57,7 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
       <h2 className="text-xl font-bold text-center text-white">
         {mode === "login" ? "Login" : mode === "register" ? "Register" : "Forgot Password"}
       </h2>
-      <div className="flex flex-col flex-1 items-center h-1/3 w-1/2 bg-purple m-4 p-4">
+      <div className="flex flex-col flex-1 items-center h-1/3 md:w-2/3 lg:w-2/3 bg-purple m-4 p-4">
 
         <input
           type="text"

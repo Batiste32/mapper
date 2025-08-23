@@ -38,7 +38,7 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
   };
 
   return (
-    <div className="p-4 bg-purple rounded h-full flex flex-col">
+    <div className="p-4 bg-purple rounded sm:h-1/3 md:h-full lg:h-full md:w-1/3 flex flex-col">
       <h2 className="font-bold text-white">Filters</h2>
 
       <div className="overflow-y-auto flex-1 pr-2 max-h-64">
