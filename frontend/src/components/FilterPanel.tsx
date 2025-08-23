@@ -38,10 +38,10 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
   };
 
   return (
-    <div className="p-4 bg-purple rounded">
+    <div className="p-4 bg-purple rounded h-full flex flex-col">
       <h2 className="font-bold text-white">Filters</h2>
 
-      <div className="overflow-y-auto flex flex-col pr-2">
+      <div className="overflow-y-auto flex-1 pr-2 max-h-64">
         {Object.entries(fields).map(([field, type]) => (
           <AutocompleteInput
             key={field}
