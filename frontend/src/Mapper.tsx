@@ -144,84 +144,71 @@ export default function Mapper({ goBack }: Props) {
     fetchValidValues("political_lean", setValidAlignments);
   }, []);
 
-  const handleSearch = async () => {
+  const applyFilters = async (filters: Record<string, any>) => {
     setMapperWait(true);
 
     let lat: number = start[0];
     let lon: number = start[1];
 
-    if (startAddress.trim()) {
+    if (filters.startAddress && filters.startAddress.trim()) {
       try {
         const geoRes = await fetch(
-          `${API_BASE}/geocode?q=${encodeURIComponent(startAddress)}`,
-          {
-            headers: {
-              "ngrok-skip-browser-warning": "true",
-            },
-          }
+          `${API_BASE}/geocode?q=${encodeURIComponent(filters.startAddress)}`,
+          { headers: { "ngrok-skip-browser-warning": "true" } }
         );
         const geoData = await geoRes.json();
-
         if (geoData.length > 0) {
           lat = parseFloat(geoData[0].lat);
           lon = parseFloat(geoData[0].lon);
-        } else {
-          alert("Address not found. Falling back to geolocation.");
         }
       } catch (error) {
-        alert("Geocoding failed. Falling back to geolocation.");
         console.error("Geocoding error:", error);
       }
     }
 
-    // Sanitize min_score_vote
     const safeFilters = {
       ...filters,
-      ...(filters.min_score_vote === "" && { min_score_vote: undefined })
-    };
-
-    console.log("Sending filters :", {
-      ...safeFilters,
+      ...(filters.min_score_vote === "" && { min_score_vote: undefined }),
       start_lat: lat,
       start_lon: lon,
-    });
+    };
+
     try {
       const res = await fetch(`${API_BASE}/profiles/optimize`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-        body: JSON.stringify({
-          ...safeFilters,
-          start_lat: lat ?? 0,
-          start_lon: lon ?? 0,
-        }),
+        body: JSON.stringify(safeFilters),
       });
-
       const data = await res.json();
-      console.log(data);
 
       setStart([data.start.lat, data.start.lon]);
-
-      const routeLatLng = data.route.coordinates.map(([lon, lat]: [number, number]) => [lat, lon]);
+      const routeLatLng = data.route.coordinates.map(
+        ([lon, lat]: [number, number]) => [lat, lon]
+      );
       setRoute(routeLatLng);
 
       const markerList = data.markers.map((m: MarkerData, idx: number) => ({
         position: [m.lat, m.lon],
         color: m.color,
-        properties: { index: idx + 1, array_id: m.id,
-          name: m.name, personality: m.personality,
-          arguments: m.arguments, nbhood: m.nbhood,
-          preferred_language: m.preferred_language, origin: m.origin,
-          political_scale: m.political_scale, ideal_process: m.ideal_process,
+        properties: {
+          index: idx + 1,
+          array_id: m.id,
+          name: m.name,
+          personality: m.personality,
+          arguments: m.arguments,
+          nbhood: m.nbhood,
+          preferred_language: m.preferred_language,
+          origin: m.origin,
+          political_scale: m.political_scale,
+          ideal_process: m.ideal_process,
           strategic_profile: m.strategic_profile,
         },
       }));
 
       setMarkers(markerList);
-    }
-    catch (err) {
-      console.error(`Failed to search :`, err);
-    }
-    finally {
+    } catch (err) {
+      console.error("Failed to search:", err);
+    } finally {
       setMapperWait(false);
     }
   };
@@ -243,9 +230,7 @@ export default function Mapper({ goBack }: Props) {
   return (
     <div className="flex flex-col h-full bg-midnight" id="mapper-main">
       <div className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen" id="panels-layout">
-        <FilterPanel filters={filters} setFilters={setFilters}
-          startAddress={startAddress} setStartAddress={setStartAddress} handleSearch={handleSearch} 
-          validEthnicities={validEthnicities} validAlignments={validAlignments} mapperWait={mapperWait}/>
+        <FilterPanel applyFilters={applyFilters} />
 
         <MapPanel start={start} route={route} markers={markers} selectedProfile={selectedProfile} ToggleProfileDisplay={ToggleProfileDisplay} />
 
