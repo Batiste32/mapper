@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Body, Query, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, Dict, Any
 import httpx
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 
 import backend.database as db_module
 from backend.database.models import Profile
@@ -15,14 +16,14 @@ router = APIRouter()
 class RouteRequest(BaseModel):
     start_lat: float
     start_lon: float
-    ethnicity: str | None = None
-    political_alignment: str | None = None
-    min_score_vote: int | None = None
+    filters: Optional[Dict[str, Any]] = None
+
 
 @router.post("/profiles/optimize")
 def optimize_profiles(req: RouteRequest = Body(...)):
     """
-    - Filter profiles
+    - Accepts arbitrary filters as {field: value}
+    - Filter profiles dynamically
     - If > 60 points, cluster & multi-batch
     - Else run standard single batch
     - Get real road route
@@ -30,17 +31,29 @@ def optimize_profiles(req: RouteRequest = Body(...)):
     """
 
     db = db_module.SessionLocal()
-    print(str(db_module.SessionLocal.kw['bind'].url))
     query = db.query(Profile)
 
-    if req.ethnicity:
-        query = query.filter(Profile.origin == req.ethnicity)
+    # Apply filters dynamically
+    if req.filters:
+        filter_clauses = []
+        for field, value in req.filters.items():
+            if not hasattr(Profile, field):
+                raise HTTPException(status_code=400, detail=f"Invalid field: {field}")
 
-    if req.political_alignment:
-        query = query.filter(Profile.political_lean == req.political_alignment)
+            col = getattr(Profile, field)
 
-    if req.min_score_vote:
-        query = query.filter(Profile.score_vote >= req.min_score_vote)
+            if isinstance(value, dict):
+                if "gte" in value:
+                    filter_clauses.append(col >= value["gte"])
+                if "lte" in value:
+                    filter_clauses.append(col <= value["lte"])
+                if "eq" in value:
+                    filter_clauses.append(col == value["eq"])
+            else:
+                filter_clauses.append(col == value)
+
+        if filter_clauses:
+            query = query.filter(and_(*filter_clauses))
 
     profiles = query.all()
     db.close()
@@ -64,8 +77,8 @@ def optimize_profiles(req: RouteRequest = Body(...)):
 
     start_coord = (req.start_lat, req.start_lon)
 
+    # Clustering vs single batch
     if len(points) > 30:
-        print(f"Large batch: {len(points)} points. Clustering...")
         clusters = cluster_points(points, max_cluster_size=50)
         full_ordered_points, cluster_results = combine_cluster_routes(
             start_coord,
@@ -73,16 +86,16 @@ def optimize_profiles(req: RouteRequest = Body(...)):
             points,
             profile_ids
         )
-        print("Clusters optimized, drawing map...")
-        route_geojson = display_clustered_route(full_ordered_points, cluster_results, start_coord=start_coord)
-        print(route_geojson)
+        route_geojson = display_clustered_route(
+            full_ordered_points, cluster_results, start_coord=start_coord
+        )
         return route_geojson
-    
-    print(f"Small batch: {len(points)} points. Single optimization...")
-    result, id_map = get_optimized_route(start_coord[0],start_coord[1],points=points,profile_ids=profile_ids
+
+    result, id_map = get_optimized_route(
+        start_coord[0], start_coord[1], points=points, profile_ids=profile_ids
     )
 
-    # Ordered points
+    # reconstruct ordered points
     steps = result["routes"][0]["steps"]
     ordered_points = []
     for step in steps:
@@ -91,30 +104,27 @@ def optimize_profiles(req: RouteRequest = Body(...)):
             profile_id = id_map[job_id]
             ordered_points.append(profiles_map[profile_id])
 
-    print("Drawing map...")
     route_geojson = display_route_on_map(
         result,
         id_map,
         profiles_map,
         start_coord=start_coord
     )
-    print(route_geojson)
     return route_geojson
+
 
 @router.get("/geocode")
 async def geocode_address(q: str = Query(..., description="The address to geocode")):
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={q}"
-
     headers = {
-        "User-Agent": "YourAppName/1.0 (your@email.com)"  # Nominatim requires a real User-Agent
+        "User-Agent": "YourAppName/1.0 (your@email.com)"
     }
 
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(url, headers=headers)
             response.raise_for_status()
-            data = response.json()
-            return data
+            return response.json()
         except httpx.RequestError as exc:
             return JSONResponse(content={"error": f"Network error: {exc}"}, status_code=500)
         except httpx.HTTPStatusError as exc:
