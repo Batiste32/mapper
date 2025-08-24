@@ -35,6 +35,7 @@ def optimize_profiles(req: RouteRequest = Body(...)):
 
     # Apply filters dynamically
     if req.filters:
+        print(f"Filtering database on : {req.filters}")
         filter_clauses = []
         for field, value in req.filters.items():
             if not hasattr(Profile, field):
@@ -51,7 +52,7 @@ def optimize_profiles(req: RouteRequest = Body(...)):
                     filter_clauses.append(col == value["eq"])
             else:
                 filter_clauses.append(col == value)
-
+        
         if filter_clauses:
             query = query.filter(and_(*filter_clauses))
 
