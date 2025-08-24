@@ -10,9 +10,8 @@ import FilterPanel from "./components/FilterPanel";
 import MapPanel from "./components/MapPanel";
 import ProfilePanel from "./components/ProfilePanel";
 
-import './App.css'
+import "./App.css";
 
-// Fix Leaflet's default icon path
 (L.Icon.Default.prototype as any)._getIconUrl = undefined;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -63,86 +62,10 @@ type Props = {
 export default function Mapper({ goBack }: Props) {
   const API_BASE = import.meta.env.VITE_API_BASE;
   const [start, setStart] = useState<LatLng>([45.45, -73.64]);
-  const [filters, setFilters] = useState({
-    ethnicity: "",
-    political_alignment: "",
-    min_score_vote: "",
-  });
   const [route, setRoute] = useState<LatLng[] | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [selectedProfile, setSelectedProfile] = useState<Marker["properties"] | null>(null);
-  const [startAddress, setStartAddress] = useState<string>("");
   const [mapperWait, setMapperWait] = useState<boolean>(false);
-
-  /* Valid database input fields */
-  const [validEthnicities, setValidEthnicities] = useState([]);
-  const [validAlignments, setValidAlignments] = useState([]);
-
-  useEffect(() => {
-    console.log("API_BASE:", import.meta.env.VITE_API_BASE);
-    if (!startAddress) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setStart([pos.coords.latitude, pos.coords.longitude]);
-        },
-        () => {}
-      );
-    }
-  }, [startAddress]);
-
-  useEffect(() => {
-    let watchId: number;
-
-    if (startAddress.trim() === "") {
-      if (navigator.geolocation) {
-        watchId = navigator.geolocation.watchPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            const newPos: LatLng = [latitude, longitude];
-
-            setStart(newPos);
-
-            setRoute((prevRoute) => {
-              if (!prevRoute) return null;
-              return trimRoute(newPos, prevRoute);
-            });
-          },
-          (err) => {
-            console.error("Geolocation error:", err);
-          },
-          { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
-        );
-      }
-    }
-
-    return () => {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-    };
-  }, [startAddress]);
-
-  const fetchValidValues = async (field: string, setter: React.Dispatch<React.SetStateAction<never[]>>) => {
-    try {
-      const res = await fetch(`${API_BASE}/profiles/valid_values?field=${field}`,
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      console.log(res)
-      const data = await res.json();
-      setter(data);
-    } catch (err) {
-      console.error(`Failed to fetch values for field "${field}":`, err);
-      setter([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchValidValues("origin", setValidEthnicities);
-    fetchValidValues("political_lean", setValidAlignments);
-  }, []);
 
   const applyFilters = async (filters: Record<string, any>) => {
     setMapperWait(true);
@@ -212,31 +135,35 @@ export default function Mapper({ goBack }: Props) {
       setMapperWait(false);
     }
   };
-  
-  const ToggleProfileDisplay = (properties: Marker["properties"]) => {
-    setSelectedProfile((prev) => prev && prev.array_id === properties.array_id ? null : properties);
-  };
 
-  function trimRoute(currentPosition: LatLng, route: LatLng[]) {
-    const threshold = 0.0005; // approx 50m depending on lat/lon
-    return route.filter(([lat, lon]) => {
-      const dist = Math.sqrt(
-        Math.pow(currentPosition[0] - lat, 2) + Math.pow(currentPosition[1] - lon, 2)
-      );
-      return dist > threshold;
-    });
-  }
+  const ToggleProfileDisplay = (properties: Marker["properties"]) => {
+    setSelectedProfile((prev) =>
+      prev && prev.array_id === properties.array_id ? null : properties
+    );
+  };
 
   return (
     <div className="flex flex-col h-full bg-midnight" id="mapper-main">
-      <div className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen" id="panels-layout">
+      <div
+        className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen"
+        id="panels-layout"
+      >
         <FilterPanel applyFilters={applyFilters} />
 
-        <MapPanel start={start} route={route} markers={markers} selectedProfile={selectedProfile} ToggleProfileDisplay={ToggleProfileDisplay} />
+        <MapPanel
+          start={start}
+          route={route}
+          markers={markers}
+          selectedProfile={selectedProfile}
+          ToggleProfileDisplay={ToggleProfileDisplay}
+        />
 
         <ProfilePanel selectedProfile={selectedProfile} />
       </div>
-      <button onClick={goBack} className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded">
+      <button
+        onClick={goBack}
+        className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
+      >
         Back to Upload
       </button>
     </div>
