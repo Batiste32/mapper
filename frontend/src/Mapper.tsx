@@ -67,51 +67,70 @@ export default function Mapper({ goBack }: Props) {
   const [selectedProfile, setSelectedProfile] = useState<Marker["properties"] | null>(null);
   const [mapperWait, setMapperWait] = useState<boolean>(false);
 
-  const applyFilters = async (filters: Record<string, any>) => {
+  const applyFilters = async (raw: Record<string, any>) => {
     setMapperWait(true);
+    try {
+      // default to current map start
+      let lat = start[0];
+      let lon = start[1];
 
-    let lat: number = start[0];
-    let lon: number = start[1];
-
-    if (filters.startAddress && filters.startAddress.trim()) {
-      try {
-        const geoRes = await fetch(
-          `${API_BASE}/geocode?q=${encodeURIComponent(filters.startAddress)}`,
-          { headers: { "ngrok-skip-browser-warning": "true" } }
-        );
+      // allow either start_lat/lon from panel or a startAddress to geocode
+      if (raw.start_lat && raw.start_lon) {
+        lat = parseFloat(String(raw.start_lat));
+        lon = parseFloat(String(raw.start_lon));
+      } else if (raw.startAddress && String(raw.startAddress).trim()) {
+        const geoRes = await fetch(`${API_BASE}/geocode?q=${encodeURIComponent(raw.startAddress)}`,
+          { headers: { "ngrok-skip-browser-warning": "true" } });
         const geoData = await geoRes.json();
-        if (geoData.length > 0) {
+        if (Array.isArray(geoData) && geoData.length) {
           lat = parseFloat(geoData[0].lat);
           lon = parseFloat(geoData[0].lon);
         }
-      } catch (error) {
-        console.error("Geocoding error:", error);
       }
-    }
 
-    const safeFilters = {
-      ...filters,
-      ...(filters.min_score_vote === "" && { min_score_vote: undefined }),
-      start_lat: lat,
-      start_lon: lon,
-    };
+      // drop any start_* keys and build the nested filters object
+      const { start_lat: _slat, start_lon: _slon, startAddress: _saddr, ...rest } = raw;
 
-    try {
+      // map friendly -> DB field names (optional; backend also supports this)
+      const aliasMap: Record<string, string> = {
+        ethnicity: "origin",
+        political_alignment: "political_lean",
+        min_score_vote: "score_vote",
+      };
+
+      const cleaned: Record<string, any> = {};
+      for (const [k, v] of Object.entries(rest)) {
+        if (v === "" || v === null || v === undefined) continue;
+        const key = aliasMap[k] ?? k;
+        if (k === "min_score_vote") {
+          cleaned[key] = { gte: Number(v) };
+        } else {
+          cleaned[key] = v;
+        }
+      }
+
+      const payload = { start_lat: lat, start_lon: lon, filters: cleaned };
+
       const res = await fetch(`${API_BASE}/profiles/optimize`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-        body: JSON.stringify(safeFilters),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
 
+      if (!data || !data.route || !data.start) {
+        console.warn("No route returned:", data);
+        setRoute(null);
+        setMarkers([]);
+        return;
+      }
+
       setStart([data.start.lat, data.start.lon]);
-      const routeLatLng = data.route.coordinates.map(
-        ([lon, lat]: [number, number]) => [lat, lon]
-      );
+      const routeLatLng = data.route.coordinates.map(([lon2, lat2]: [number, number]) => [lat2, lon2]);
       setRoute(routeLatLng);
 
-      const markerList = data.markers.map((m: MarkerData, idx: number) => ({
-        position: [m.lat, m.lon],
+      const markerList = data.markers.map((m: any, idx: number) => ({
+        position: [m.lat, m.lon] as [number, number],
         color: m.color,
         properties: {
           index: idx + 1,
@@ -127,7 +146,6 @@ export default function Mapper({ goBack }: Props) {
           strategic_profile: m.strategic_profile,
         },
       }));
-
       setMarkers(markerList);
     } catch (err) {
       console.error("Failed to search:", err);
