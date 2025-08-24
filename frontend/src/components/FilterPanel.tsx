@@ -9,6 +9,9 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
   const [fields, setFields] = useState<{ [key: string]: string }>({});
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [suggestions, setSuggestions] = useState<{ [key: string]: string[] }>({});
+  const [startAddress, setStartAddress] = useState("");
+  const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
+
 
   // Fetch available fields on mount
   useEffect(() => {
@@ -37,10 +40,63 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
     setFilters((prev) => ({ ...prev, [field]: value }));
   };
 
+  const fetchGeocode = async (query: string) => {
+    if (!query) {
+      setAddressSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE}/geocode?q=${encodeURIComponent(query)}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setAddressSuggestions(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch geocode suggestions", err);
+    }
+  };
+
+  const handleSelectAddress = (val: any) => {
+    setStartAddress(val.display_name);
+    setFilters((prev) => ({
+      ...prev,
+      start_lat: val.lat,
+      start_lon: val.lon,
+    }));
+    setAddressSuggestions([]);
+  };
+
   return (
     <div className="p-4 bg-purple rounded sm:h-1/4 md:h-full lg:h-full md:w-1/3 flex flex-col">
       <h2 className="font-bold text-white">Filters</h2>
-
+      <div className="relative mb-4">
+        <label className="block text-sm font-medium mb-1">Start Address</label>
+        <input
+          type="text"
+          value={startAddress}
+          onChange={(e) => {
+            setStartAddress(e.target.value);
+            fetchGeocode(e.target.value);
+          }}
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Enter start address"
+        />
+        {addressSuggestions.length > 0 && (
+          <ul className="absolute z-10 bg-purple border rounded w-full max-h-40 overflow-y-auto mt-1">
+            {addressSuggestions.map((addr) => (
+              <li
+                key={addr.place_id}
+                className="px-3 py-2 hover:bg-lavender cursor-pointer"
+                onMouseDown={() => handleSelectAddress(addr)}
+              >
+                {addr.display_name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <div className="overflow-y-auto flex-1 pr-2 max-h-128 sm:max-h-48">
         {Object.entries(fields).map(([field, type]) => (
           <AutocompleteInput
