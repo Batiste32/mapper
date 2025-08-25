@@ -129,12 +129,12 @@ def display_clustered_route(full_ordered_points, cluster_results, start_coord=No
     }
 
     # Track the global order of clusters
-    for cluster_idx, cluster_points in enumerate(cluster_results):
+    for cluster_idx, (ordered_points, ordered_ids) in enumerate(cluster_results):
         # Prepend start coordinate for the first cluster only
         if cluster_idx == 0 and start_coord:
-            points_to_route = [start_coord] + cluster_points
+            points_to_route = [start_coord] + ordered_points
         else:
-            points_to_route = cluster_points
+            points_to_route = ordered_points
 
         # ORS requires lon, lat order, so get_directions_route will handle that
         if len(points_to_route) < 2:
