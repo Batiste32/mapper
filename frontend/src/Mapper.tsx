@@ -87,7 +87,7 @@ export default function Mapper({ goBack }: Props) {
           lon = parseFloat(geoData[0].lon);
         }
       }
-
+      console.log("Starting from :",lat,lon);
       // drop any start_* keys and build the nested filters object
       const { start_lat: _slat, start_lon: _slon, startAddress: _saddr, ...rest } = raw;
 
@@ -110,7 +110,7 @@ export default function Mapper({ goBack }: Props) {
       }
 
       const payload = { start_lat: lat, start_lon: lon, filters: cleaned };
-
+      console.log("Sending payload :",payload);
       const res = await fetch(`${API_BASE}/profiles/optimize`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },

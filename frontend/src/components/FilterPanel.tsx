@@ -78,7 +78,6 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
           value={startAddress}
           onChange={(e) => {
             setStartAddress(e.target.value);
-            fetchGeocode(e.target.value);
           }}
           className="w-full border px-3 py-2 rounded"
           placeholder="Enter start address"
@@ -110,7 +109,10 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
         ))}
       </div>
       <button
-        onClick={() => applyFilters(filters)}
+        onClick={() => {
+          fetchGeocode(startAddress);
+          applyFilters(filters);
+        }}
         className="bg-midnight hover:bg-lavender p-2 mt-4 rounded text-white"
       >
         Apply Filters
