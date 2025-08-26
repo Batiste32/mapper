@@ -103,11 +103,11 @@ def optimize_profiles(req: RouteRequest = Body(...)):
         markers.append({
             "lat": p.latitude,
             "lon": p.longitude,
-            "color": "#ff0000",   # TODO: pick your logic
+            "color": "#42326E",
             "id": p.id,
             "name": p.name,
             "personality": p.personality,
-            "arguments": p.arguments,
+            "arguments": p.suggested_arguments,
             "nbhood": p.nbhood,
             "preferred_language": p.preferred_language,
             "origin": p.origin,
