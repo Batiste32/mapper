@@ -69,7 +69,7 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
   };
 
   return (
-    <div id="filter-main" className="p-4 bg-purple rounded sm:h-1/4 md:h-full lg:h-full md:w-1/3 flex flex-col">
+    <div id="filter-main" className="p-4 bg-purple rounded portrait:h-1/3 landscape:h-full md:h-1/2 lg:h-full sm:w-1/4 flex flex-col">
       <h2 className="font-bold text-white">Filters</h2>
       <div id="start-address" className="relative mb-4">
         <label className="block text-sm font-medium mb-1">Start Address</label>
@@ -96,7 +96,7 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
           </ul>
         )}
       </div>
-      <div className="overflow-y-auto pr-2 max-h-128 sm:max-h-48">
+      <div className="overflow-y-auto pr-2 lg:flex lg:flex-col">
         {Object.entries(fields).map(([field, type]) => (
           <AutocompleteInput
             key={field}
