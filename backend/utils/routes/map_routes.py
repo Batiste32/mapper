@@ -90,10 +90,44 @@ def optimize_profiles(req: RouteRequest = Body(...)):
         full_ordered_points, cluster_results = combine_cluster_routes(
             start_coord, clusters, points, profile_ids
         )
-        return display_clustered_route(full_ordered_points, cluster_results, start_coord=start_coord)
+        route_geojson = display_clustered_route(full_ordered_points, cluster_results, start_coord=start_coord)
+    else :
+        result, id_map = get_optimized_route(start_coord[0], start_coord[1], points=points, profile_ids=profile_ids)
+        route_geojson = display_route_on_map(result, id_map, profiles_map, start_coord=start_coord)
+    
+    # Build markers
+    markers = []
+    for p in profiles:
+        if p.latitude is None or p.longitude is None:
+            continue
+        markers.append({
+            "lat": p.latitude,
+            "lon": p.longitude,
+            "color": "#ff0000",   # TODO: pick your logic
+            "id": p.id,
+            "name": p.name,
+            "personality": p.personality,
+            "arguments": p.arguments,
+            "nbhood": p.nbhood,
+            "preferred_language": p.preferred_language,
+            "origin": p.origin,
+            "political_scale": p.political_scale,
+            "ideal_process": p.ideal_process,
+            "strategic_profile": p.strategic_profile,
+        })
 
-    result, id_map = get_optimized_route(start_coord[0], start_coord[1], points=points, profile_ids=profile_ids)
-    return display_route_on_map(result, id_map, profiles_map, start_coord=start_coord)
+    # Extract coordinates from GeoJSON
+    coordinates = []
+    for feature in route_geojson.get("features", []):
+        geom = feature.get("geometry", {})
+        if geom.get("type") == "LineString":
+            coordinates.extend(geom.get("coordinates", []))
+
+    return {
+        "start": {"lat": req.start_lat, "lon": req.start_lon},
+        "route": {"coordinates": coordinates},
+        "markers": markers,
+    }
 
 @router.get("/geocode")
 async def geocode_address(q: str = Query(..., description="The address to geocode")):
