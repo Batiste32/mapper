@@ -1,5 +1,6 @@
 from math import radians, cos, sin, asin, sqrt
 import requests
+import json
 import csv
 from sqlalchemy.orm import sessionmaker
 import os
@@ -150,7 +151,8 @@ def get_optimized_route(start_lat,start_lon,points,profile_ids,lat_first=True,lo
     for idx, (real_id, coordinate) in enumerate(zip(profile_ids, coordinates), start=1):
         jobs.append({
             "id": idx,
-            "location": coordinate
+            "location": coordinate,
+            "type": "job"
         })
         id_map[idx] = real_id
 
@@ -158,6 +160,7 @@ def get_optimized_route(start_lat,start_lon,points,profile_ids,lat_first=True,lo
         "jobs": jobs,
         "vehicles": [vehicle]
     }
+    print("Request body to ORS:", json.dumps(body, indent=2))
     try :
         response = requests.post(url, json=body, headers=headers)
         response.raise_for_status()
