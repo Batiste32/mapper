@@ -42,7 +42,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
         />
       </label>
       {showSuggestions && filteredSuggestions.length > 0 && (
-        <ul className="absolute z-10 bg-purple border rounded w-full max-h-40 overflow-y-auto mt-1">
+        <ul className="absolute z-10 bg-midnight border rounded w-full max-h-40 overflow-y-auto mt-1">
           {filteredSuggestions.map((val) => (
             <li
               key={val}

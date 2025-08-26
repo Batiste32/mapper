@@ -120,6 +120,7 @@ export default function Mapper({ goBack }: Props) {
 
       if (!data || !data.route || !data.start) {
         console.warn("No route returned:", data);
+        alert(data.message)
         setRoute(null);
         setMarkers([]);
         return;

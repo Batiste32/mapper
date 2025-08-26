@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PasswordInput from "./components/PasswordInput";
+import LoadingButton from "./components/LoadingButton";
 
 interface LoginPanelProps {
   setUsername: (u: string) => void;
@@ -96,13 +97,9 @@ export default function LoginPanel({ setUsername, setPassword, setHasDatabase }:
           />
         )}
 
-        <button
-          disabled={logging}
-          onClick={handleSubmit}
-          className={`text-white m-4 p-4 rounded ${logging ? "bg-lavender opacity-50 cursor-wait" : "bg-midnight hover:bg-lavender"}`}
-        >
-            {mode === "login" ? "Login" : mode === "register" ? "Register" : "Reset Password"}
-        </button>
+        <LoadingButton text={mode === "login" ? "Login" : mode === "register" ? "Register" : "Reset Password"}
+          loadingParameter={logging} onClick={handleSubmit}
+        />
       </div>
       {/* Switch between modes */}
       <div className="text-sm text-gray-300 text-center">
