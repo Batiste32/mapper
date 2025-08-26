@@ -167,7 +167,7 @@ export default function Mapper({ goBack }: Props) {
         className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen"
         id="panels-layout"
       >
-        <FilterPanel applyFilters={applyFilters} />
+        <FilterPanel applyFilters={applyFilters} mapperWait={mapperWait} />
 
         <MapPanel
           start={start}

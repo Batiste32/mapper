@@ -11,7 +11,7 @@ export default function LoadingButton({ text, loadingParameter, onClick }: Loadi
     <button
       onClick={onClick}
       disabled={loadingParameter}
-      className="relative flex items-center justify-center px-4 py-2 rounded-lg bg-midnight text-white hover:bg-lavender disabled:opacity-70 disabled:cursor-not-allowed"
+      className="relative flex items-center justify-center m-4 p-4 rounded-lg bg-midnight text-white hover:bg-lavender disabled:opacity-50 disabled:cursor-wait"
     >
       {loadingParameter ? (
         <svg

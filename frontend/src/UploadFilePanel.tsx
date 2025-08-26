@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import LoadingButton from "./components/LoadingButton";
+
 type Props = {
   username: string;
   password: string;
@@ -94,14 +96,8 @@ export default function UploadFilePanel({ username, password, setHasDatabase, sw
       />
 
       <div className="flex flex-row">
-        <button
-          onClick={handleUpload}
-          disabled={fileLoading || !selectedFile}
-          className={`flex flex-1 p-4 m-2 rounded text-white justify-center items-center
-            ${fileLoading ? "bg-lavender opacity-50 cursor-wait" : selectedFile ? "bg-midnight hover:bg-lavender" : "bg-dark cursor-not-allowed"}`}
-        >
-          {fileLoading ? "Uploading..." : "Upload File"}
-        </button>
+
+        <LoadingButton text="Upload File" loadingParameter={fileLoading} onClick={handleUpload} />
 
         <button
           onClick={switchPanel}

@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import AutocompleteInput from "./AutocompleteInput";
+import LoadingButton from "./LoadingButton";
 
 interface FilterPanelProps {
   applyFilters: (filters: Record<string, string>) => void;
+  mapperWait: boolean;
 }
 
-export default function FilterPanel({ applyFilters }: FilterPanelProps) {
+export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelProps) {
   const [fields, setFields] = useState<{ [key: string]: string }>({});
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [suggestions, setSuggestions] = useState<{ [key: string]: string[] }>({});
   const [startAddress, setStartAddress] = useState("");
   const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
-
 
   // Fetch available fields on mount
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
           value={startAddress}
           onChange={(e) => {
             setStartAddress(e.target.value);
+            fetchGeocode(startAddress);
           }}
           className="w-full border px-3 py-2 rounded"
           placeholder="Enter start address"
@@ -108,15 +110,7 @@ export default function FilterPanel({ applyFilters }: FilterPanelProps) {
           />
         ))}
       </div>
-      <button
-        onClick={() => {
-          fetchGeocode(startAddress);
-          applyFilters(filters);
-        }}
-        className="bg-midnight hover:bg-lavender p-2 mt-4 rounded text-white"
-      >
-        Apply Filters
-      </button>
+      <LoadingButton onClick={()=>applyFilters(filters)} text="Apply Filters" loadingParameter={mapperWait} />
     </div>
   );
 }
