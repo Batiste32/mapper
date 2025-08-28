@@ -180,15 +180,26 @@ export default function Mapper({ goBack }: Props) {
         className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen"
         id="panels-layout"
       >
+        {/* Left collapsible panel (Filters) */}
+        <CollapsePanel direction="left" className="w-1/3">
           <FilterPanel applyFilters={applyFilters} mapperWait={mapperWait} />
-        <MapPanel
-          start={start}
-          route={route}
-          markers={markers}
-          selectedProfile={selectedProfile}
-          ToggleProfileDisplay={ToggleProfileDisplay}
-        />
-        <ProfilePanel selectedProfile={selectedProfile} />
+        </CollapsePanel>
+
+        {/* Center map always expands */}
+        <div className="flex-1">
+          <MapPanel
+            start={start}
+            route={route}
+            markers={markers}
+            selectedProfile={selectedProfile}
+            ToggleProfileDisplay={ToggleProfileDisplay}
+          />
+        </div>
+
+        {/* Right collapsible panel (Profile) */}
+        <CollapsePanel direction="right" className="w-1/3">
+          <ProfilePanel selectedProfile={selectedProfile} />
+        </CollapsePanel>
       </div>
       <div className="flex flex-row">
         <button
