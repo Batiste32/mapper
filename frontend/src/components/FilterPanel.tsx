@@ -21,6 +21,18 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
       .then((data) => setFields(data));
   }, []);
 
+  useEffect(() => {
+    const handleReset = () => {
+      setFields({});
+      setFilters({});
+      setStartAddress("");
+    };
+
+    window.addEventListener("reset-filters", handleReset);
+    return () => window.removeEventListener("reset-filters", handleReset);
+  }, []);
+
+
   // Fetch valid values for categorical fields
   const fetchSuggestions = async (field: string) => {
     if (suggestions[field]) return;
