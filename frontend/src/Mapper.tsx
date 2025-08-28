@@ -68,6 +68,18 @@ export default function Mapper({ goBack }: Props) {
   const [selectedProfile, setSelectedProfile] = useState<Marker["properties"] | null>(null);
   const [mapperWait, setMapperWait] = useState<boolean>(false);
 
+  const resetAll = () => {
+    setRoute(null);
+    setMarkers([]);
+    setSelectedProfile(null);
+    setStart([45.45, -73.64]); // reset to default center
+
+    // Notify FilterPanel to reset itself
+    const resetEvent = new CustomEvent("reset-filters");
+    window.dispatchEvent(resetEvent);
+  };
+
+
   const applyFilters = async (raw: Record<string, any>) => {
     setMapperWait(true);
     try {
@@ -168,9 +180,7 @@ export default function Mapper({ goBack }: Props) {
         className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen"
         id="panels-layout"
       >
-        <CollapsePanel direction="right" className="w-full sm:w-1/3">
           <FilterPanel applyFilters={applyFilters} mapperWait={mapperWait} />
-        </CollapsePanel>
         <MapPanel
           start={start}
           route={route}
@@ -178,17 +188,22 @@ export default function Mapper({ goBack }: Props) {
           selectedProfile={selectedProfile}
           ToggleProfileDisplay={ToggleProfileDisplay}
         />
-
-      <CollapsePanel direction="left" className="w-full sm:w-1/3">
         <ProfilePanel selectedProfile={selectedProfile} />
-      </CollapsePanel>
       </div>
-      <button
-        onClick={goBack}
-        className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
-      >
-        Back to Upload
-      </button>
+      <div className="flex flex-row">
+        <button
+          onClick={goBack}
+          className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
+        >
+          Back to Upload
+        </button>
+        <button
+          onClick={resetAll}
+          className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
+        >
+          Reset Map
+        </button>
+      </div>
     </div>
   );
 }
