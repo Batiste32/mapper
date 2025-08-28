@@ -70,7 +70,7 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
   };
 
   return (
-    <div id="filter-main" className="p-4 bg-purple rounded h-1/3 sm:h-1/4 md:h-full lg:h-full md:w-1/3 flex flex-col">
+    <div id="filter-main" className="p-4 bg-purple rounded h-1/3 sm:h-full md:h-full lg:h-full md:w-1/3 flex flex-col">
       <h2 className="font-bold text-white">Filters</h2>
       <div id="start-address" className="relative mb-4">
         <label className="block text-sm font-medium mb-1">Start Address</label>
