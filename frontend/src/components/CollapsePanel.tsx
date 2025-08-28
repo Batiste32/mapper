@@ -26,7 +26,7 @@ export default function CollapsePanel({ direction, children, className }: Collap
       {/* Collapse / Expand Button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className={`absolute top-1/2 -translate-y-1/2 bg-gray-800 text-white p-1 rounded-full shadow-md hover:bg-gray-700 ${
+        className={`absolute top-1/2 z-10 -translate-y-1/2 bg-gray-800 text-white p-1 rounded-full shadow-md hover:bg-gray-700 ${
           direction === "left" ? "right-0 translate-x-1/2" : "left-0 -translate-x-1/2"
         }`}
       >
