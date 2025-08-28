@@ -6,6 +6,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+import CollapsePanel from "./components/CollapsePanel";
 import FilterPanel from "./components/FilterPanel";
 import MapPanel from "./components/MapPanel";
 import ProfilePanel from "./components/ProfilePanel";
@@ -120,7 +121,7 @@ export default function Mapper({ goBack }: Props) {
 
       if (!data || !data.route || !data.start) {
         console.warn("No route returned:", data);
-        alert(data.message)
+        if (data?.message) alert(data.message);
         setRoute(null);
         setMarkers([]);
         return;
@@ -167,8 +168,9 @@ export default function Mapper({ goBack }: Props) {
         className="flex-1 flex flex-col sm:flex-row bg-midnight h-screen"
         id="panels-layout"
       >
-        <FilterPanel applyFilters={applyFilters} mapperWait={mapperWait} />
-
+        <CollapsePanel direction="right" className="w-full sm:w-1/3">
+          <FilterPanel applyFilters={applyFilters} mapperWait={mapperWait} />
+        </CollapsePanel>
         <MapPanel
           start={start}
           route={route}
@@ -177,7 +179,9 @@ export default function Mapper({ goBack }: Props) {
           ToggleProfileDisplay={ToggleProfileDisplay}
         />
 
+      <CollapsePanel direction="left" className="w-full sm:w-1/3">
         <ProfilePanel selectedProfile={selectedProfile} />
+      </CollapsePanel>
       </div>
       <button
         onClick={goBack}
