@@ -193,13 +193,13 @@ export default function Mapper({ goBack }: Props) {
       <div className="flex flex-row">
         <button
           onClick={goBack}
-          className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
+          className="flex-1 p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
         >
           Back to Upload
         </button>
         <button
           onClick={resetAll}
-          className="p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
+          className="flex-1 p-4 m-4 bg-purple hover:bg-lavender text-white rounded"
         >
           Reset Map
         </button>

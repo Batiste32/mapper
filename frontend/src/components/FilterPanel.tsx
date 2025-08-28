@@ -23,7 +23,6 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
 
   useEffect(() => {
     const handleReset = () => {
-      setFields({});
       setFilters({});
       setStartAddress("");
     };
