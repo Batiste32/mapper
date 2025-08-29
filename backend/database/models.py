@@ -78,3 +78,9 @@ class ConnectionLog(Base):
 
     user = relationship("User", back_populates="logs")
     device = relationship("Device", back_populates="logs")
+
+class FieldMetadata(Base):
+    __tablename__ = "field_metadata"
+    field_name = Column(String, primary_key=True, index=True)
+    label = Column(String)
+    description = Column(String)

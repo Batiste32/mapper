@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+
 import AutocompleteInput from "./AutocompleteInput";
 import LoadingButton from "./LoadingButton";
+import FieldLabel from "./FieldLabel";
 
 interface FilterPanelProps {
   applyFilters: (filters: Record<string, string>) => void;
@@ -134,14 +136,16 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
       </div>
       <div className="overflow-y-auto pr-2">
         {Object.entries(fields).map(([field, type]) => (
-          <AutocompleteInput
-            key={field}
-            label={formatLabel(field)}
-            value={filters[field] || ""}
-            onChange={(val) => handleChange(field, val)}
-            suggestions={suggestions[field] || []}
-            onFocus={() => fetchSuggestions(field)}
-          />
+          <>
+            <FieldLabel field={field} />
+            <AutocompleteInput
+              key={field}
+              value={filters[field] || ""}
+              onChange={(val) => handleChange(field, val)}
+              suggestions={suggestions[field] || []}
+              onFocus={() => fetchSuggestions(field)}
+            />
+          </>
         ))}
       </div>
       <LoadingButton onClick={()=>applyFilters(filters)} text="Apply Filters" loadingParameter={mapperWait} />
