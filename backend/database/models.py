@@ -83,4 +83,4 @@ class FieldMetadata(Base):
     __tablename__ = "field_metadata"
     field_name = Column(String, primary_key=True, index=True)
     label = Column(String)
-    description = Column(String)
+    descript = Column(String)
