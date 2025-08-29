@@ -17,6 +17,29 @@ type ProfilePanelProps = {
 };
 
 export default function ProfilePanel({ selectedProfile }: ProfilePanelProps) {
+
+  const format_aliases: Record<string, string> = {
+    origin: "Ethnicity",
+    political_lean: "Political Alignment",
+    score_vote: "Voting Score",
+    nbhood: "Neighborhood",
+    preferred_language: "Preferred Language",
+    ideal_process: "Ideal Process",
+    strategic_profile: "Strategic Profile",
+  };
+
+  function formatLabel(key: string): string {
+    // Use alias if defined
+    if (format_aliases[key]) return format_aliases[key];
+
+    // Otherwise apply casing
+    return key
+      .replace(/_/g, " ")
+      .replace(/\w\S*/g, (w) => 
+        w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+      );
+  }
+
   return (
     <div
       className={`w-full p-4 bg-midnight border-t sm:border-t-0 sm:border-l max-h-[30vh] sm:max-h-none overflow-auto z-10
@@ -27,11 +50,11 @@ export default function ProfilePanel({ selectedProfile }: ProfilePanelProps) {
       {selectedProfile ? (
         <div>
           {Object.entries(selectedProfile).map(([k, v]) => (
-            <div className="m-3" key={k}>
-              <p>
-                <strong>{k}</strong>: {v ?? "N/A"}
-              </p>
-            </div>
+            <ul className="m-3" key={k}>
+              <li key={k} className="text-sm">
+                <span className="font-semibold">{formatLabel(k)}:</span> {v}
+              </li>
+            </ul>
           ))}
         </div>
       ) : (

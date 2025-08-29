@@ -14,6 +14,28 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
   const [startAddress, setStartAddress] = useState("");
   const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
 
+  const format_aliases: Record<string, string> = {
+    origin: "Ethnicity",
+    political_lean: "Political Alignment",
+    score_vote: "Voting Score",
+    nbhood: "Neighborhood",
+    preferred_language: "Preferred Language",
+    ideal_process: "Ideal Process",
+    strategic_profile: "Strategic Profile",
+  };
+
+  function formatLabel(key: string): string {
+    // Use alias if defined
+    if (format_aliases[key]) return format_aliases[key];
+
+    // Otherwise apply casing
+    return key
+      .replace(/_/g, " ")
+      .replace(/\w\S*/g, (w) => 
+        w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+      );
+  }
+
   // Fetch available fields on mount
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE}/profiles/fields`)
@@ -113,7 +135,7 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
         {Object.entries(fields).map(([field, type]) => (
           <AutocompleteInput
             key={field}
-            label={field}
+            label={formatLabel(field)}
             value={filters[field] || ""}
             onChange={(val) => handleChange(field, val)}
             suggestions={suggestions[field] || []}
