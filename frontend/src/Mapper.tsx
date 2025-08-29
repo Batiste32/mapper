@@ -186,6 +186,7 @@ export default function Mapper({ goBack }: Props) {
         </CollapsePanel>
 
         {/* Center map always expands */}
+        <div>
           <MapPanel
             start={start}
             route={route}
@@ -193,6 +194,7 @@ export default function Mapper({ goBack }: Props) {
             selectedProfile={selectedProfile}
             ToggleProfileDisplay={ToggleProfileDisplay}
           />
+        </div>
 
         {/* Right collapsible panel (Profile) */}
         <CollapsePanel direction="right" className="w-1/3">
