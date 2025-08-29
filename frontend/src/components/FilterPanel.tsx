@@ -22,6 +22,7 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
     preferred_language: "Preferred Language",
     ideal_process: "Ideal Process",
     strategic_profile: "Strategic Profile",
+    uniqueid: "Text ID"
   };
 
   function formatLabel(key: string): string {
