@@ -40,7 +40,7 @@ export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        const res = await fetch(`${API_BASE}/field_metadata/${field}`, {
+        const res = await fetch(`${API_BASE}/profiles/field_metadata/${field}`, {
           headers: { "ngrok-skip-browser-warning": "true" },
         });
         if (!res.ok) throw new Error("Failed to fetch metadata");
