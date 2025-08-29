@@ -186,7 +186,7 @@ export default function Mapper({ goBack }: Props) {
         </CollapsePanel>
 
         {/* Center map always expands */}
-        <div>
+        <div className="flex-1">
           <MapPanel
             start={start}
             route={route}

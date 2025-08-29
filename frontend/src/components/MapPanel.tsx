@@ -67,9 +67,7 @@ export default function MapPanel({
 
   return (
     <div
-      className={`transition-width flex-1 ${
-        selectedProfile ? "sm:w-1/4" : ""
-      } h-[50vh] sm:h-full z-0 relative`}
+      className={`flex-1 h-[50vh] sm:h-full z-0 relative`}
     >
       <MapContainer center={start} zoom={13} className="flex-1 h-full absolute inset-0 z-0">
         <TileLayer
