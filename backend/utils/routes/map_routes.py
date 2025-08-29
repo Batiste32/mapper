@@ -71,7 +71,9 @@ def optimize_profiles(req: RouteRequest = Body(...)):
 
     if not profiles:
         return {"message": "No matching profiles found."}
-
+    elif len(profiles) > 45 :
+        profiles = profiles[:45]
+        print("Trimmed profiles to 45 points")
     points, profile_ids, profiles_map = [], [], {}
     for p in profiles:
         if p.latitude is None or p.longitude is None:
