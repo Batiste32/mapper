@@ -84,3 +84,4 @@ class FieldMetadata(Base):
     field_name = Column(String, primary_key=True, index=True)
     label = Column(String)
     descript = Column(String)
+    visible = Column(Boolean)
