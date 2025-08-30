@@ -136,16 +136,21 @@
         </div>
         <div className="overflow-y-auto pr-2">
           {Object.entries(fields).map(([field, type]) => (
-            <>
-              <FieldLabel field={field} filter_visible_check={true} />
-              <AutocompleteInput
-                key={field}
-                value={filters[field] || ""}
-                onChange={(val) => handleChange(field, val)}
-                suggestions={suggestions[field] || []}
-                onFocus={() => fetchSuggestions(field)}
-              />
-            </>
+            <FieldLabel
+              key={field}
+              field={field}
+              filter_visible_check={true}
+              renderInput={(visible) =>
+                visible && (
+                  <AutocompleteInput
+                    value={filters[field] || ""}
+                    onChange={(val) => handleChange(field, val)}
+                    suggestions={suggestions[field] || []}
+                    onFocus={() => fetchSuggestions(field)}
+                  />
+                )
+              }
+            />
           ))}
         </div>
         <LoadingButton onClick={()=>applyFilters(filters)} text="Apply Filters" loadingParameter={mapperWait} />

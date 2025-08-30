@@ -9,8 +9,9 @@ type FieldMetadata = {
 
 type Props = {
   field: string;
+  filter_visible_check: boolean;
   API_BASE?: string;
-  filter_visible_check: boolean; 
+  renderInput?: (visible: boolean) => React.ReactNode;
 };
 
   const format_aliases: Record<string, string> = {
@@ -36,7 +37,7 @@ type Props = {
       );
   }
 
-export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_BASE, filter_visible_check = false }: Props) {
+export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_BASE, filter_visible_check = false, renderInput }: Props) {
   const [metadata, setMetadata] = useState<FieldMetadata | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -46,47 +47,41 @@ export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_
         const res = await fetch(`${API_BASE}/profiles/field_metadata/${field}`, {
           headers: { "ngrok-skip-browser-warning": "true" },
         });
-        if (!res.ok) throw new Error("Failed to fetch metadata");
         const data = await res.json();
-        if (filter_visible_check) {
-          if (data.visible) {
-            setMetadata(data);
-          } else {
-            setMetadata(null);
-          }
+        if (filter_visible_check && !data.visible) {
+          setMetadata(null); // mark as invisible
         } else {
           setMetadata(data);
         }
       } catch (err) {
         console.error("Failed to load metadata:", err);
-        setMetadata({ field_name: field, label: null, description: null });
+        setMetadata({ field_name: field, label: null, description: null, visible: false });
       }
     };
     fetchMetadata();
   }, [field, API_BASE]);
 
+  if (!metadata) return null;
+
   const label = metadata?.label || formatLabel(field);
   const description = metadata?.description || "No description available.";
 
-  const toggleTooltip = () => setShowTooltip((prev) => !prev);
-
   return (
-    <div className="relative inline-block">
+    <div className="mb-2">
       <span
         className="cursor-help underline decoration-dotted"
-        onClick={toggleTooltip}            // mobile 
-        onMouseEnter={() => setShowTooltip(true)}  // desktop 
-        onMouseLeave={() => setShowTooltip(false)} // desktop 
+        onClick={() => setShowTooltip((prev) => !prev)}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
       >
         {label}
       </span>
-
       {showTooltip && description && (
-        <div
-          className="flex bg-midnight text-sm rounded p-1">
+        <div className="flex bg-midnight text-sm rounded p-1 mt-1">
           {description}
         </div>
       )}
+      {renderInput && renderInput(true)}
     </div>
   );
 }
