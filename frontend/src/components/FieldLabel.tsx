@@ -48,10 +48,13 @@ export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_
         });
         if (!res.ok) throw new Error("Failed to fetch metadata");
         const data = await res.json();
-        if (filter_visible_check == true) {
-          setMetadata(data.filter((f: FieldMetadata) => f.visible));
-        }
-        else {
+        if (filter_visible_check) {
+          if (data.visible) {
+            setMetadata(data);
+          } else {
+            setMetadata(null);
+          }
+        } else {
           setMetadata(data);
         }
       } catch (err) {
