@@ -73,9 +73,7 @@ export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_
 
       {showTooltip && description && (
         <div
-          className="absolute z-50 mt-2 w-64 p-2 rounded-md bg-gray-800 text-white text-sm shadow-lg"
-          style={{ left: "50%", transform: "translateX(-50%)" }}
-        >
+          className="flex bg-midnight text-sm rounded p-1">
           {description}
         </div>
       )}
