@@ -36,6 +36,7 @@ type Props = {
 
 export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_BASE }: Props) {
   const [metadata, setMetadata] = useState<FieldMetadata | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -57,12 +58,27 @@ export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_
   const label = metadata?.label || formatLabel(field);
   const description = metadata?.description || "No description available.";
 
+  const toggleTooltip = () => setShowTooltip((prev) => !prev);
+
   return (
-    <label
-      className="font-medium cursor-help"
-      title={description} // tooltip
-    >
-      {label}
-    </label>
+    <div className="relative inline-block">
+      <span
+        className="cursor-help underline decoration-dotted"
+        onClick={toggleTooltip}            // mobile 
+        onMouseEnter={() => setShowTooltip(true)}  // desktop 
+        onMouseLeave={() => setShowTooltip(false)} // desktop 
+      >
+        {label}
+      </span>
+
+      {showTooltip && description && (
+        <div
+          className="absolute z-50 mt-2 w-64 p-2 rounded-md bg-gray-800 text-white text-sm shadow-lg"
+          style={{ left: "50%", transform: "translateX(-50%)" }}
+        >
+          {description}
+        </div>
+      )}
+    </div>
   );
 }
