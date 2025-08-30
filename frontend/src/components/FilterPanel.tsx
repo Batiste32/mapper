@@ -137,7 +137,7 @@ export default function FilterPanel({ applyFilters, mapperWait }: FilterPanelPro
       <div className="overflow-y-auto pr-2">
         {Object.entries(fields).map(([field, type]) => (
           <>
-            <FieldLabel field={field} />
+            <FieldLabel field={field} filter_visible_check={true} />
             <AutocompleteInput
               key={field}
               value={filters[field] || ""}

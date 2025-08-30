@@ -4,11 +4,13 @@ type FieldMetadata = {
   field_name: string;
   label: string | null;
   description: string | null;
+  visible: boolean | null;
 };
 
 type Props = {
   field: string;
-  API_BASE?: string; 
+  API_BASE?: string;
+  filter_visible_check: boolean; 
 };
 
   const format_aliases: Record<string, string> = {
@@ -34,7 +36,7 @@ type Props = {
       );
   }
 
-export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_BASE }: Props) {
+export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_BASE, filter_visible_check = false }: Props) {
   const [metadata, setMetadata] = useState<FieldMetadata | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -46,7 +48,12 @@ export default function FieldLabel({ field, API_BASE = import.meta.env.VITE_API_
         });
         if (!res.ok) throw new Error("Failed to fetch metadata");
         const data = await res.json();
-        setMetadata(data);
+        if (filter_visible_check == true) {
+          setMetadata(data.filter((f: FieldMetadata) => f.visible));
+        }
+        else {
+          setMetadata(data);
+        }
       } catch (err) {
         console.error("Failed to load metadata:", err);
         setMetadata({ field_name: field, label: null, description: null });
