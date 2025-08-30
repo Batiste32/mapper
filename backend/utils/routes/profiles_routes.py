@@ -132,7 +132,7 @@ def get_valid_values(field: str, db: Session = Depends(get_db)):
 
 @router.get("/field_metadata/{field_name}")
 def get_field_metadata(field_name: str, db: Session = Depends(get_db)):
-    meta = db.query(FieldMetadata).filter(FieldMetadata.field_name == field_name and FieldMetadata.visible).first()
+    meta = db.query(FieldMetadata).filter(FieldMetadata.field_name == field_name and FieldMetadata.visible == 1).first()
     if not meta:
         return {"field_name": field_name, "label": None, "description": None}
     return {"field_name": meta.field_name, "label": meta.label, "description": meta.descript}
