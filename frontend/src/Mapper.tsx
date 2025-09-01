@@ -37,23 +37,8 @@ type Marker = {
     political_scale: string;
     ideal_process: string;
     strategic_profile: string;
+    picture_url: string;
   };
-};
-
-type MarkerData = {
-  lat: number;
-  lon: number;
-  color: string;
-  id: string;
-  name: string;
-  personality: string;
-  arguments: string;
-  nbhood: string;
-  preferred_language: string;
-  origin: string;
-  political_scale: string;
-  ideal_process: string;
-  strategic_profile: string;
 };
 
 type Props = {
@@ -158,6 +143,7 @@ export default function Mapper({ goBack }: Props) {
           political_scale: m.political_scale,
           ideal_process: m.ideal_process,
           strategic_profile: m.strategic_profile,
+          picture_url: m.picture_url,
         },
       }));
       setMarkers(markerList);
