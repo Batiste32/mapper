@@ -49,6 +49,7 @@ export default function ProfilePanel({ selectedProfile }: ProfilePanelProps) {
     const isImage = lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".gif") || lower.endsWith(".webp");
 
     if (isImage) {
+      console.log("Detected Image for value :",value)
       return (
         <img
           src={value}

@@ -116,6 +116,7 @@ def optimize_profiles(req: RouteRequest = Body(...)):
             "political_scale": p.political_scale,
             "ideal_process": p.ideal_process,
             "strategic_profile": p.strategic_profile,
+            "picture_url": p.picture_url,
         })
 
     # Extract coordinates from GeoJSON
